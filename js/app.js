@@ -10,10 +10,11 @@
   const EASE = "cubic-bezier(.22,.8,.2,1)";
   const pad = (n) => String(n).padStart(2, "0");
 
-  /* ---------- 一件衣服：一张图（正面 + 衣架 + 挂钩），挂着时在 3D 里转开 rest 度 ---------- */
-  const face = (p, shade = true) =>
-    `<div class="face" style="--rest:${p.rest || 72}deg"><img src="${p.img}" alt="${p.name}" draggable="false">` +
-    (shade ? `<i class="shade" style="-webkit-mask-image:url('${p.img}');mask-image:url('${p.img}')"></i>` : "") + `</div>`;
+  /* ---------- 一件衣服：挂着时是侧面，悬停时逐帧播放 AI 生成的真实转身（侧面 → 正面） ---------- */
+  const TURN_MS = 750;
+  const face = (p, still = false) => still
+    ? `<div class="face"><img src="${p.img}" alt="${p.name}" draggable="false"></div>`
+    : `<div class="face"><div class="turn" role="img" aria-label="${p.name}" style="background-image:url('${p.turn}');background-size:${p.frames * 100}% 100%"></div></div>`;
 
   /* ---------- 挂上衣服 ---------- */
   rack.style.setProperty("--n", N);
@@ -21,6 +22,35 @@
     `<button class="item" data-i="${i}" aria-label="${p.name}"><div class="swing">${face(p)}</div></button>`
   ).join("");
   const items = [...itemsEl.children];
+  P.forEach((p) => { new Image().src = p.turn; });
+
+  // 每件衣服的播放状态：f = 当前帧（小数），to = 目标帧
+  const turns = items.map((el, i) => ({ el: el.querySelector(".turn"), n: P[i].frames, f: 0, to: 0 }));
+  function drawFrame(t) {
+    const k = Math.round(t.f);
+    t.el.style.backgroundPosition = `${(k / (t.n - 1)) * 100}% 0`;
+  }
+  let last = 0, running = false;
+  function tick(now) {
+    const dt = Math.min(64, now - (last || now));
+    last = now;
+    let busyAny = false;
+    for (const t of turns) {
+      if (t.f === t.to) continue;
+      const step = (t.n - 1) * dt / (reduce ? 1 : TURN_MS);
+      t.f = t.f < t.to ? Math.min(t.to, t.f + step) : Math.max(t.to, t.f - step);
+      drawFrame(t);
+      if (t.f !== t.to) busyAny = true;
+    }
+    if (busyAny) requestAnimationFrame(tick);
+    else { running = false; last = 0; }
+  }
+  function turnTo(i, front, instant = false) {
+    const t = turns[i];
+    t.to = front ? t.n - 1 : 0;
+    if (instant) { t.f = t.to; drawFrame(t); return; }
+    if (!running) { running = true; requestAnimationFrame(tick); }
+  }
 
   /* ---------- 尺寸（随窗口变化，现算） ---------- */
   function dims() {
@@ -70,10 +100,11 @@
         sway(i, a);
       });
     }
-    if (hovered >= 0) items[hovered].classList.remove("on");
+    if (hovered >= 0) { items[hovered].classList.remove("on"); turnTo(hovered, false, quiet); }
     hovered = h;
     if (h >= 0) {
       items[h].classList.add("on");
+      turnTo(h, true, quiet);
       label.textContent = P[h].name;
       const fresh = !label.classList.contains("show");
       if (fresh) label.style.transition = "none";   // 第一次出现不要从别处滑过来
@@ -92,7 +123,7 @@
     el.addEventListener("click", () => {
       if (body.classList.contains("is-detail")) return;
       if (canHover || hovered === i) openDetail(i);
-      else { setHover(i); setTimeout(() => openDetail(i), 380); }   // 手机：先转身再打开
+      else { setHover(i); setTimeout(() => openDetail(i), TURN_MS); }   // 手机：先转身再打开
     });
   });
   itemsEl.addEventListener("mouseenter", () => { pointerOnRack = true; });
@@ -107,7 +138,7 @@
   /* ---------- 详情 ---------- */
   let cur = 0, busy = false;
   function renderDetail(i) {
-    dItem.innerHTML = face(P[i], false);
+    dItem.innerHTML = face(P[i], true);
     dCount.textContent = `${pad(i + 1)} / ${pad(N)}`;
     dName.textContent = P[i].name;
   }

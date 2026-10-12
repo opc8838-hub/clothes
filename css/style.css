@@ -128,32 +128,23 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   margin-left: -8px; background: var(--ink); border-radius: 2px;
 }
 
-/* 摆动层（绕挂杆晃）→ 衣服层（绕挂钩竖轴转身） */
+/* 摆动层（绕挂杆晃）→ 衣服帧条 */
 .swing {
   position: absolute; inset: 0; transform-origin: 50% 0;
-  perspective: calc(var(--gh) * 3.2);
-  filter: drop-shadow(0 calc(var(--gh) * .022) calc(var(--gh) * .028) rgba(0, 0, 0, .17));
+  filter: drop-shadow(0 calc(var(--gh) * .022) calc(var(--gh) * .028) rgba(0, 0, 0, .16));
 }
 .face {
   position: absolute; top: 0; left: calc(50% - var(--fw) / 2);
   width: var(--fw); height: calc(var(--hook) + var(--gh));
-  transform: rotateY(var(--rest, 72deg));
-  transition: transform .62s cubic-bezier(.3, .75, .2, 1);
-  will-change: transform;
 }
-.item.on .face { transform: rotateY(0deg); }
-.face img, .face .shade {
+.face img, .face .turn {
   position: absolute; left: 0; top: calc(var(--gh) * -16 / 340);
   width: 100%; height: calc(var(--gh) * 406 / 340);
 }
+.face .turn { height: calc(var(--gh) * 440 / 340); }   /* 帧条底部多留 34 单位给下垂的布料 */
+.face { pointer-events: none; }   /* 画布比挂位宽，不能挡住旁边那件的鼠标 */
+.face .turn { background-repeat: no-repeat; background-position: 0 0; }
 .face img { user-select: none; -webkit-user-drag: none; pointer-events: none; }
-/* 转开时远侧变暗，转正后淡掉 */
-.face .shade {
-  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
-  background: linear-gradient(90deg, rgba(0, 0, 0, .02), rgba(0, 0, 0, .16) 50%, rgba(0, 0, 0, .42));
-  transition: opacity .55s var(--ease);
-}
-.item.on .face .shade { opacity: 0; }
 
 .hover-label {
   position: absolute; left: 0; top: calc(var(--hook) + var(--gh) + var(--gh) * .1);
@@ -191,7 +182,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   filter: drop-shadow(0 calc(var(--gh) * .022) calc(var(--gh) * .03) rgba(0, 0, 0, .16));
 }
 .d-item.show { visibility: visible; }
-.d-item .face { left: 0; transform: none; transition: none; }
+.d-item .face { left: 0; }
 .arrow, .d-meta { opacity: 0; transition: opacity .45s var(--ease); }
 .arrow {
   position: absolute; top: calc(50% - 8vh + min(50vh, 36vw) * 25 / 340); width: 38px; height: 38px;
@@ -209,7 +200,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   margin: 0; font-family: var(--serif); font-style: italic; font-weight: 400;
   font-size: clamp(20px, 2.2vw, 30px); letter-spacing: 0; transition: opacity .2s;
 }
-.no-anim .item, .no-anim .face, .no-anim .shade { transition: none !important; }
+.no-anim .item { transition: none !important; }
 
 /* 进入详情后的整体状态 */
 body.is-detail .rack-wrap { filter: blur(14px); opacity: .3; transform: scale(.985); pointer-events: none; }
@@ -269,6 +260,6 @@ body.is-detail .marquee { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .face, .item { transition-duration: .01s; }
+  .item { transition-duration: .01s; }
   .marquee-track { animation-duration: 160s; }
 }
