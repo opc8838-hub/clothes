@@ -1,14 +1,14 @@
-// 衣服清单：换衣服只改这里。
-// front = 正面图，side = 侧挂图（建议透明底 PNG）；hanger: false 表示照片里自带衣架，不再画木衣架。
+// 衣服清单：换衣服 / 改名字 / 调顺序只改这里。
+// img  = tools/build_garments.py 生成的图（正面 + 衣架 + 挂钩）
+// rest = 挂在杆上时转开的角度（度），每件略有不同显得自然
 window.PRODUCTS = [
-  { id: "01", name: "Present Camo Tee",          front: "assets/clothes/01-front.svg", side: "assets/clothes/01-side.svg", hanger: true },
-  { id: "02", name: "Present Tee — Black",       front: "assets/clothes/02-front.svg", side: "assets/clothes/02-side.svg", hanger: true },
-  { id: "03", name: "Your Present Script Tee",   front: "assets/clothes/03-front.svg", side: "assets/clothes/03-side.svg", hanger: true },
-  { id: "04", name: "Be Here Right Now Tee",     front: "assets/clothes/04-front.svg", side: "assets/clothes/04-side.svg", hanger: true },
-  { id: "05", name: "Open It Today Crewneck",    front: "assets/clothes/05-front.svg", side: "assets/clothes/05-side.svg", hanger: true },
-  { id: "06", name: "Present Badge Long Sleeve", front: "assets/clothes/06-front.svg", side: "assets/clothes/06-side.svg", hanger: true },
-  { id: "07", name: "Present Flowers Tee",       front: "assets/clothes/07-front.svg", side: "assets/clothes/07-side.svg", hanger: true },
-  { id: "08", name: "Gift Time Tee",             front: "assets/clothes/08-front.svg", side: "assets/clothes/08-side.svg", hanger: true },
-  { id: "09", name: "Present Stack Tee",         front: "assets/clothes/09-front.svg", side: "assets/clothes/09-side.svg", hanger: true },
-  { id: "10", name: "Present Tee — Grey",        front: "assets/clothes/10-front.svg", side: "assets/clothes/10-side.svg", hanger: true },
+  { id: "01", name: "Now Open 24 Hours Tee",       img: "assets/clothes/01.webp", rest: 74 },
+  { id: "02", name: "hely.fun Tee — Black",        img: "assets/clothes/02.webp", rest: 70 },
+  { id: "03", name: "Sunday Afternoon Tee",        img: "assets/clothes/03.webp", rest: 73 },
+  { id: "04", name: "Glasses Portrait Tee",        img: "assets/clothes/04.webp", rest: 71 },
+  { id: "08", name: "your present Script Tee",     img: "assets/clothes/08.webp", rest: 72 },
+  { id: "05", name: "Time Tee — Sky Blue",         img: "assets/clothes/05.webp", rest: 75 },
+  { id: "06", name: "Human in Control Tee",        img: "assets/clothes/06.webp", rest: 70 },
+  { id: "09", name: "“Your present” Tee — Navy",   img: "assets/clothes/09.webp", rest: 73 },
+  { id: "07", name: "Back 2 Work Studio Tee",      img: "assets/clothes/07.webp", rest: 71 },
 ];

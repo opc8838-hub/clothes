@@ -1,12 +1,10 @@
 # your present
 
-衣架作品集网站：衣服侧挂在挂杆上，鼠标移上去会转成正面、两边的衣服被挤开；点击后放大看详情，用左右箭头切换。
+衣架作品集网站：T 恤挂在不锈钢挂杆上、转开约 72°；鼠标移上去会在 3D 里转回正面、两边的衣服被挤开晃动；点击后放大看详情，用左右箭头切换。
 
-纯静态网页，不需要安装任何东西。
+纯静态网页，不需要安装任何东西。线上地址：https://opc8838-hub.github.io/clothes/
 
 ## 本地预览
-
-在这个文件夹里运行：
 
 ```
 python -m http.server 8765
@@ -14,25 +12,30 @@ python -m http.server 8765
 
 然后用浏览器打开 http://127.0.0.1:8765
 
-## 换成自己的衣服
+## 加 / 换衣服（三步）
 
-1. 每件衣服准备两张 **透明底 PNG**：
-   - `xx-front.png`：正面平挂（领口朝上、衣服居中）
-   - `xx-side.png`：侧挂（对折后从侧面看）
-   - 比例尽量接近：正面图 300:340，侧面图 110:340，领口贴着图片顶部
-2. 放进 `assets/clothes/`
-3. 打开 `data/products.js`，改 `name`（名字）、`front`、`side` 三项
-4. 如果照片里已经有衣架，把那件的 `hanger` 改成 `false`
+1. **抠图**：白底正面 T 恤照片放进一个文件夹，运行
+   ```
+   python -P tools/cutout.py <照片文件夹> <抠图输出文件夹>
+   ```
+   白色、浅色衣服如果被抠坏，加 `--flood 03,05`（写文件名）改用填充法。
+2. **加衣架**：
+   ```
+   python tools/build_garments.py <抠图输出文件夹> assets/clothes
+   ```
+   会生成 `assets/clothes/NN.webp`（正面 + 红木衣架 + 金属挂钩）。
+3. **登记**：打开 `data/products.js`，加一行：名字 `name`、图片 `img`、挂着时转开的角度 `rest`。
 
-现在仓库里的是代码画的占位衣服（`.svg`），由 `tools/make_placeholders.py` 生成。
+需要的 Python 包：`rembg`、`opencv-python`、`numpy`、`Pillow`、`scipy`。
 
 ## 常改的地方
 
 | 想改什么 | 在哪改 |
 |---|---|
-| 品牌色（logo、文字、按钮） | `css/style.css` 顶部 `--ink` |
-| 底部跑马灯颜色 | `css/style.css` 顶部 `--bar` |
+| 主色（logo、文字、按钮） | `css/style.css` 顶部 `--ink` |
+| 跑马灯颜色 | `css/style.css` 顶部 `--bar`、`--bar-ink` |
+| 跑马灯文字 | `js/app.js` 里的 `unit` |
 | 衣服大小 | `css/style.css` 顶部 `--gh` |
-| 跑马灯文字 | `js/app.js` 最后的 `unit` |
+| 衣服顺序 / 名字 | `data/products.js` |
 | About / Contact / Availability 文字 | `index.html` 底部的三个 `<template>` |
 | Logo | 替换 `assets/logo.png`（黑色字、透明底） |

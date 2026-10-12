@@ -10,39 +10,21 @@
   const EASE = "cubic-bezier(.22,.8,.2,1)";
   const pad = (n) => String(n).padStart(2, "0");
 
-  /* ---------- 木衣架（与衣服图同一坐标系：正面 300 宽，侧面 110 宽，领口在 y=0~20） ---------- */
-  document.body.insertAdjacentHTML("afterbegin",
-    `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-      <linearGradient id="ypWood" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#9a5634"/><stop offset=".55" stop-color="#6f3520"/><stop offset="1" stop-color="#4a2113"/>
-      </linearGradient></defs></svg>`);
-  const HOOK = 'stroke="#a3a3a6" stroke-width="2.4" fill="none" stroke-linecap="round"';
-  const hangerSVG = {
-    front: `<svg class="hanger" viewBox="0 -50 300 90" preserveAspectRatio="none">
-      <path d="M150 8 L150 -38 C150 -58 170 -60 171 -46" ${HOOK}/>
-      <path d="M62 34 Q150 -8 238 34 L238 44 Q150 8 62 44 Z" fill="url(#ypWood)"/>
-      <rect x="143" y="2" width="14" height="10" rx="2" fill="#c9c9cc"/></svg>`,
-    side: `<svg class="hanger" viewBox="0 -50 110 90" preserveAspectRatio="none">
-      <path d="M53 8 L53 -38 C53 -58 71 -60 72 -46" ${HOOK}/>
-      <path d="M45 6 L61 6 L63 32 L43 32 Z" fill="url(#ypWood)"/>
-      <rect x="48" y="2" width="10" height="7" rx="2" fill="#c9c9cc"/></svg>`,
-  };
-  const face = (p, kind) =>
-    `<div class="face ${kind}">${p.hanger !== false ? hangerSVG[kind] : ""}` +
-    `<img src="${p[kind]}" alt="${kind === "front" ? p.name : ""}" draggable="false"></div>`;
+  /* ---------- 一件衣服：一张图（正面 + 衣架 + 挂钩），挂着时在 3D 里转开 rest 度 ---------- */
+  const face = (p, shade = true) =>
+    `<div class="face" style="--rest:${p.rest || 72}deg"><img src="${p.img}" alt="${p.name}" draggable="false">` +
+    (shade ? `<i class="shade" style="-webkit-mask-image:url('${p.img}');mask-image:url('${p.img}')"></i>` : "") + `</div>`;
 
   /* ---------- 挂上衣服 ---------- */
   rack.style.setProperty("--n", N);
   itemsEl.innerHTML = P.map((p, i) =>
-    `<button class="item" data-i="${i}" aria-label="${p.name}"><div class="swing">${face(p, "side")}${face(p, "front")}</div></button>`
+    `<button class="item" data-i="${i}" aria-label="${p.name}"><div class="swing">${face(p)}</div></button>`
   ).join("");
   const items = [...itemsEl.children];
-  P.forEach((p) => { new Image().src = p.front; });
 
   /* ---------- 尺寸（随窗口变化，现算） ---------- */
   function dims() {
-    const img = items[0].querySelector(".face.side img");
-    const gh = img.offsetHeight;
+    const gh = items[0].offsetHeight * 340 / 390;
     return { slot: gh * .29, open: gh * 300 / 340 + gh * .08 };
   }
   // 第 i 件衣服的中心相对整排中点的位置（h = 正在转正面的那件）
@@ -125,7 +107,7 @@
   /* ---------- 详情 ---------- */
   let cur = 0, busy = false;
   function renderDetail(i) {
-    dItem.innerHTML = face(P[i], "front");
+    dItem.innerHTML = face(P[i], false);
     dCount.textContent = `${pad(i + 1)} / ${pad(N)}`;
     dName.textContent = P[i].name;
   }
@@ -139,7 +121,7 @@
   }
   function frontRect(i) {
     const r = items[i].getBoundingClientRect();
-    const gh = r.height - items[i].querySelector(".face.front img").offsetTop;
+    const gh = r.height * 340 / 390;
     const w = gh * 300 / 340;
     return { left: r.left + r.width / 2 - w / 2, top: r.top, width: w, height: r.height };
   }
@@ -230,8 +212,12 @@
   });
 
   /* ---------- 跑马灯 ---------- */
-  const unit = '<span>New designs daily</span><span class="dot">•</span><span>Subscribe to our newsletter</span><span class="dot">•</span>';
+  const unit = '<span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span>';
   $("marquee").innerHTML = unit.repeat(8) + unit.repeat(8);
+
+  // 手机上衣架比屏幕宽：打开时先滚到中间
+  const wrap = $("rackWrap");
+  if (wrap.scrollWidth > wrap.clientWidth) wrap.scrollLeft = (wrap.scrollWidth - wrap.clientWidth) / 2;
 
   window.addEventListener("resize", () => {
     if (hovered >= 0) label.style.left = `${rack.offsetLeft + rack.offsetWidth / 2 + pos(hovered, hovered, dims())}px`;

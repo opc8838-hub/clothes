@@ -20,7 +20,32 @@
   <main class="scene">
     <div class="rack-wrap" id="rackWrap">
       <div class="rack" id="rack">
-        <div class="rod" aria-hidden="true"><i class="cap l"></i><i class="cap r"></i></div>
+        <div class="rod" aria-hidden="true">
+        <svg width="0" height="0" style="position:absolute"><defs>
+          <linearGradient id="ypPlate" x1="0" x2="1"><stop offset="0" stop-color="#b9b9be"/><stop offset=".28" stop-color="#ececef"/><stop offset=".55" stop-color="#d4d4d8"/><stop offset=".8" stop-color="#e2e2e5"/><stop offset="1" stop-color="#a4a4aa"/></linearGradient>
+          <linearGradient id="ypCup" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8f8f95"/><stop offset=".14" stop-color="#e4e4e7"/><stop offset=".3" stop-color="#ffffff"/><stop offset=".5" stop-color="#bdbdc2"/><stop offset=".78" stop-color="#76767c"/><stop offset="1" stop-color="#a2a2a8"/></linearGradient>
+          <radialGradient id="ypScrew" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#c4c4c9"/><stop offset="1" stop-color="#7c7c82"/></radialGradient>
+        </defs></svg>
+        <span class="tube"></span>
+        <svg class="bracket l" viewBox="0 0 46 92" aria-hidden="true">
+          <rect x="2" y="3" width="27" height="86" rx="6" fill="url(#ypPlate)" stroke="rgba(0,0,0,.22)" stroke-width=".8"/>
+          <rect x="3.2" y="4.2" width="24.6" height="83.6" rx="5" fill="none" stroke="rgba(255,255,255,.55)" stroke-width=".8"/>
+          <g><circle cx="15.5" cy="14" r="3.8" fill="url(#ypScrew)" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><path d="M13 14.6h5" stroke="rgba(0,0,0,.45)" stroke-width=".9"/></g>
+          <g><circle cx="15.5" cy="78" r="3.8" fill="url(#ypScrew)" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><path d="M13 78.6h5" stroke="rgba(0,0,0,.45)" stroke-width=".9"/></g>
+          <rect x="17" y="32" width="29" height="28" rx="3.5" fill="url(#ypCup)" stroke="rgba(0,0,0,.25)" stroke-width=".7"/>
+          <rect x="21" y="32" width="2.2" height="28" fill="rgba(255,255,255,.55)"/>
+          <rect x="40" y="32" width="1.4" height="28" fill="rgba(0,0,0,.18)"/>
+        </svg>
+        <svg class="bracket r" viewBox="0 0 46 92" aria-hidden="true">
+          <rect x="2" y="3" width="27" height="86" rx="6" fill="url(#ypPlate)" stroke="rgba(0,0,0,.22)" stroke-width=".8"/>
+          <rect x="3.2" y="4.2" width="24.6" height="83.6" rx="5" fill="none" stroke="rgba(255,255,255,.55)" stroke-width=".8"/>
+          <g><circle cx="15.5" cy="14" r="3.8" fill="url(#ypScrew)" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><path d="M13 14.6h5" stroke="rgba(0,0,0,.45)" stroke-width=".9"/></g>
+          <g><circle cx="15.5" cy="78" r="3.8" fill="url(#ypScrew)" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><path d="M13 78.6h5" stroke="rgba(0,0,0,.45)" stroke-width=".9"/></g>
+          <rect x="17" y="32" width="29" height="28" rx="3.5" fill="url(#ypCup)" stroke="rgba(0,0,0,.25)" stroke-width=".7"/>
+          <rect x="21" y="32" width="2.2" height="28" fill="rgba(255,255,255,.55)"/>
+          <rect x="40" y="32" width="1.4" height="28" fill="rgba(0,0,0,.18)"/>
+        </svg>
+      </div>
         <div class="items" id="items"></div>
       </div>
       <p class="hover-label" id="hoverLabel" aria-live="polite"></p>
@@ -46,7 +71,7 @@
     </div>
   </main>
 
-  <footer class="marquee" aria-label="New designs daily. Subscribe to our newsletter.">
+  <footer class="marquee" aria-label="Welcome. Your present.">
     <div class="marquee-track" id="marquee"></div>
   </footer>
 
