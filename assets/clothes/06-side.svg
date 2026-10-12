@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 340">
+  <defs>
+    <linearGradient id="g06s" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity=".22"/>
+      <stop offset=".18" stop-color="#000" stop-opacity=".04"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".07"/>
+      <stop offset=".82" stop-color="#000" stop-opacity=".05"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".25"/>
+    </linearGradient>
+    <linearGradient id="v06s" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".75" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".12"/>
+    </linearGradient>
+    <filter id="s06s" x="-20%" y="-10%" width="140%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <clipPath id="c06s"><path d="M52 10 Q66 16 74 28 Q90 52 90 90 L92 300 L80 306 L80 320 Q58 326 32 318 L30 70 Q32 30 52 10 Z"/></clipPath>
+  <g filter="url(#s06s)">
+    <path d="M52 10 Q66 16 74 28 Q90 52 90 90 L92 300 L80 306 L80 320 Q58 326 32 318 L30 70 Q32 30 52 10 Z" fill="#1b1a1e"/>
+    <g clip-path="url(#c06s)">
+      <g fill="none" stroke="#f0ece4" stroke-width="2" opacity=".85"><path d="M78 120 Q72 160 80 200"/><path d="M76 150 Q70 170 78 190"/></g>
+      <path d="M44 80 Q40 200 46 318" stroke="#000" stroke-opacity=".08" stroke-width="8" fill="none"/>
+      <path d="M64 120 Q70 220 62 318" stroke="#fff" stroke-opacity=".06" stroke-width="10" fill="none"/>
+      <path d="M74 30 Q90 52 90 90 L92 300 L80 306 L78 120 Q80 70 74 30 Z" fill="#000" opacity=".18"/>
+      <rect width="110" height="340" fill="url(#g06s)"/>
+      <rect width="110" height="340" fill="url(#v06s)"/>
+    </g>
+  </g>
+</svg>

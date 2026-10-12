@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 340">
+  <defs>
+    <linearGradient id="g06f" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity=".22"/>
+      <stop offset=".18" stop-color="#000" stop-opacity=".04"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".07"/>
+      <stop offset=".82" stop-color="#000" stop-opacity=".05"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".25"/>
+    </linearGradient>
+    <linearGradient id="v06f" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".75" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".12"/>
+    </linearGradient>
+    <filter id="s06f" x="-20%" y="-10%" width="140%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <clipPath id="c06f"><path d="M120 14 Q150 34 180 14 L214 20 Q248 40 258 80 L286 296 L256 304 L230 128 L232 322 Q150 330 68 322 L70 128 L44 304 L14 296 L42 80 Q52 40 86 20 Z"/></clipPath>
+  <g filter="url(#s06f)">
+    <path d="M120 14 Q150 34 180 14 L214 20 Q248 40 258 80 L286 296 L256 304 L230 128 L232 322 Q150 330 68 322 L70 128 L44 304 L14 296 L42 80 Q52 40 86 20 Z" fill="#1b1a1e"/>
+    <g clip-path="url(#c06f)">
+      <g fill="none" stroke="#f0ece4" stroke-width="3"><circle cx="150" cy="150" r="40"/><circle cx="150" cy="150" r="30"/></g><text x="150" y="98" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="30" textLength="150" lengthAdjust="spacingAndGlyphs" fill="#f0ece4">present</text><text x="150" y="162" text-anchor="middle" font-family="Georgia,serif" font-size="34" fill="#f0ece4">yp</text><text x="150" y="214" text-anchor="middle" font-family="Arial" font-size="9" letter-spacing="1.5" fill="#f0ece4">WE WERE NEVER SUPPOSED TO</text><text x="150" y="226" text-anchor="middle" font-family="Arial" font-size="9" letter-spacing="1.5" fill="#f0ece4">WAIT FOR LATER</text>
+      <path d="M110 140 Q118 230 104 318" stroke="#000" stroke-opacity=".06" stroke-width="10" fill="none"/><path d="M196 150 Q186 240 198 318" stroke="#000" stroke-opacity=".06" stroke-width="12" fill="none"/><path d="M150 40 Q152 120 150 200" stroke="#fff" stroke-opacity=".05" stroke-width="18" fill="none"/><path d="M14 296 L44 304 L46 290 L16 282 Z" fill="#000" opacity=".12"/><path d="M286 296 L256 304 L254 290 L284 282 Z" fill="#000" opacity=".12"/>
+      <rect width="300" height="340" fill="url(#g06f)"/>
+      <rect width="300" height="340" fill="url(#v06f)"/>
+    </g>
+    <path d="M120 14 Q150 34 180 14" stroke="#000" stroke-opacity=".28" stroke-width="5" fill="none"/>
+    <path d="M114 16 Q150 44 186 16" stroke="#000" stroke-opacity=".10" stroke-width="2" fill="none"/>
+  </g>
+</svg>
