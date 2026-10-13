@@ -101,8 +101,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   border-radius: 99px;
   /* 抛光镀铬：竖向是圆管的明暗（上亮下暗、底边回光），横向乘上环境反光（两端亮、中段一大片深色） */
   background:
-    linear-gradient(90deg, #fff 0%, #fff 22%, #c4c4c8 30%, #6a6a70 38%, #58585e 52%, #6c6c72 64%, #d9d9dc 74%, #fff 80%, #c9c9cd 88%, #fff 96%),
-    linear-gradient(180deg, #8e8e93 0%, #ffffff 11%, #ffffff 24%, #ececef 34%, #b4b4b9 48%, #707076 63%, #4a4a50 77%, #8a8a90 88%, #f0f0f2 95%, #707075 100%);
+    linear-gradient(90deg, #fff 0%, #fff 22%, #e4e4e7 30%, #b4b4b9 40%, #a6a6ab 52%, #b2b2b7 64%, #ebebed 74%, #fff 80%, #e6e6e9 88%, #fff 96%),
+    linear-gradient(180deg, #a0a0a5 0%, #ffffff 11%, #ffffff 26%, #f0f0f2 36%, #c6c6ca 50%, #929298 64%, #7c7c82 77%, #a8a8ad 88%, #f4f4f6 95%, #8a8a8f 100%);
   background-blend-mode: multiply;
   box-shadow: 0 calc(var(--rodh) * 1.1) calc(var(--rodh) * .9) calc(var(--rodh) * -.4) rgba(0, 0, 0, .3);
 }
@@ -151,7 +151,6 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .face .turn { height: calc(var(--gh) * 440 / 340); }   /* 帧条底部多留 34 单位给下垂的布料 */
 .face { pointer-events: none; }   /* 画布比挂位宽，不能挡住旁边那件的鼠标 */
 .face .turn { background-repeat: no-repeat; background-position: 0 0; }
-.face .turn.b { opacity: 0; }      /* 下一帧叠在上面按比例淡入：帧与帧之间平滑过渡 */
 .swing { will-change: transform; }
 .face img { user-select: none; -webkit-user-drag: none; pointer-events: none; }
 

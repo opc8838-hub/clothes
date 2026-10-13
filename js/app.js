@@ -11,13 +11,13 @@
   const pad = (n) => String(n).padStart(2, "0");
   const isDetail = () => body.classList.contains("is-detail");
 
-  /* ---------- 一件衣服：两层帧条交叉淡化，帧与帧之间也是平滑的 ---------- */
+  /* ---------- 一件衣服：一条帧条（侧面 → 正面），悬停时逐帧播放 ---------- */
   const TURN_S = .7;                 // 侧面 → 正面用时
   const layer = (p, cls) =>
     `<div class="turn ${cls}" style="background-image:url('${p.turn}');background-size:${p.frames * 100}% 100%"></div>`;
   const face = (p, still = false) => still
     ? `<div class="face"><img src="${p.img}" alt="${p.name}" draggable="false"></div>`
-    : `<div class="face" role="img" aria-label="${p.name}">${layer(p, "a")}${layer(p, "b")}</div>`;
+    : `<div class="face" role="img" aria-label="${p.name}">${layer(p, "a")}</div>`;
 
   rack.style.setProperty("--n", N);
   itemsEl.innerHTML = P.map((p, i) =>
@@ -48,10 +48,10 @@
   const W0 = 4.0, DAMP = 1.0;                       // 钟摆：周期约 1.6 秒，慢慢衰减
   const S = items.map((el, i) => ({
     el, swing: el.firstElementChild,
-    a: el.querySelector(".turn.a"), b: el.querySelector(".turn.b"),
+    a: el.querySelector(".turn.a"),
     n: P[i].frames, x: 0, v: 0, th: 0, om: 0, f: 0,
     p1: Math.random() * 6.28, p2: Math.random() * 6.28, p3: Math.random() * 6.28,
-    lastK: -1, lastOp: -1,
+    lastK: -1,
   }));
   let hovered = -1;
   S.forEach((s, i) => { s.x = pos(i, -1); });
@@ -59,15 +59,11 @@
   function render(s) {
     s.el.style.transform = `translate3d(${s.x.toFixed(2)}px,0,0)`;
     s.swing.style.transform = `rotate(${(s.th * 57.2958).toFixed(3)}deg)`;
-    const k = Math.min(s.n - 1, Math.max(0, Math.floor(s.f)));
-    const k2 = Math.min(s.n - 1, k + 1);
-    const op = Math.round((s.f - k) * 100) / 100;
+    const k = Math.min(s.n - 1, Math.max(0, Math.round(s.f)));   // 只显示一帧：两帧叠加会出重影
     if (k !== s.lastK) {
       s.a.style.backgroundPosition = `${(k / (s.n - 1)) * 100}% 0`;
-      s.b.style.backgroundPosition = `${(k2 / (s.n - 1)) * 100}% 0`;
       s.lastK = k;
     }
-    if (op !== s.lastOp) { s.b.style.opacity = op; s.lastOp = op; }
   }
 
   let last = 0, t = 0;
@@ -89,9 +85,8 @@
         s.om += al * h; s.th += s.om * h;
         s.th = Math.max(-.11, Math.min(.11, s.th));
       }
-      // 转身：悬停的那件转到正面；其它的在侧面附近轻轻扭
-      const idle = (reduce || i === hovered) ? 0 : .55 + .55 * Math.sin(.45 * t + s.p3);
-      const fTo = i === hovered ? s.n - 1 : idle;
+      // 转身：悬停的那件转到正面，其它的停在侧面
+      const fTo = i === hovered ? s.n - 1 : 0;
       const rate = (s.n - 1) / TURN_S;
       const df = fTo - s.f;
       s.f += Math.abs(df) <= rate * dt ? df : Math.sign(df) * rate * dt;
