@@ -18,7 +18,7 @@ FW, SW, HT = 300, 110, 406
 OY, ROD = 66, 16           # 衣服原点 / 挂杆中心，距图片顶部（单位）
 WEB_SCALE = .75            # 网站用图缩放
 
-WOOD = [(0, (168, 82, 58)), (.1, (136, 50, 34)), (.32, (104, 33, 22)), (.68, (76, 22, 14)), (1, (42, 11, 7))]
+WOOD = [(0, (186, 94, 62)), (.08, (148, 56, 35)), (.3, (112, 36, 22)), (.65, (80, 22, 13)), (1, (40, 10, 6))]
 CHROME = [(0, (96, 96, 102)), (.22, (226, 226, 230)), (.4, (250, 250, 252)), (.62, (160, 160, 166)), (1, (88, 88, 94))]
 
 
@@ -112,16 +112,16 @@ def render_front(cut, seed):
     top = np.where(has, (a > .5).argmax(0), Hc).astype(np.float32)
     x0 = Wc // 2
     yc = top[x0 - 2 * U:x0 + 2 * U].mean()
-    yt = yc - 15 * U                                        # 衣架顶（中间）
+    yt = yc - 27 * U                                        # 衣架顶（中间）：像参考片那样从领口露出一大截
     ks = []
-    for dx in range(12 * U, 128 * U, U):
+    for dx in range(24 * U, 128 * U, U):
         for x in (x0 - dx, x0 + dx):
             if has[x]:
                 ks.append((top[x] + 2.5 * U - yt) / dx)
-    k = float(np.clip(max(ks), .3, .9))
+    k = float(np.clip(max(ks), .35, .9))
 
     # 木衣架：一整块，顶部圆拱 + 挂钩处小凸起，中间厚两头薄
-    R = 7 * U
+    R = 9 * U
     span = 130 * U
 
     def ytop(dx):
@@ -130,7 +130,7 @@ def render_front(cut, seed):
 
     def thick(dx):
         q = np.clip(np.abs(np.asarray(dx, np.float32)) / span, 0, 1)
-        return (9 + 9 * np.exp(-(q / .12) ** 2)) * U
+        return (13 + 19 * np.exp(-(q / .2) ** 2)) * U
 
     xs = np.linspace(-span, span, 260)
     upper = [(x0 + dx, float(ytop(dx))) for dx in xs]
@@ -140,16 +140,22 @@ def render_front(cut, seed):
     wood_a = poly(Hc, Wc, upper + tip(1) + lower + tip(-1)[::-1])
     Y, X = np.mgrid[0:Hc, 0:Wc].astype(np.float32)
     DX = X - x0
+    # 衣架只许在领口一带露出来；肩膀以外必须藏在衣服后面（否则会从袖子上方戳出尖角）
+    under = cv2.dilate((a > .5).astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
+    neck = np.abs(DX) < 42 * U
+    wood_a = wood_a * neck            # 领口以外的部分本来就被衣服挡住，直接去掉
     T = (Y - ytop(DX)) / thick(DX)
     col = ramp(T, WOOD)
-    col += 75 * np.exp(-((T - .13) / .06) ** 2)[..., None] * np.clip(1 - np.abs(DX) / span, 0, 1)[..., None] ** .5
-    col += 40 * np.exp(-((DX + 1.2 * U) / (1.6 * U)) ** 2 - ((T - .3) / .35) ** 2)[..., None]   # 凸起高光
-    col *= (1 + .06 * noise(Hc, Wc, 1.5 * U, 30 * U, seed))[..., None]
+    fade = np.clip(1 - np.abs(DX) / span, 0, 1)[..., None] ** .4
+    col *= (1 + .09 * noise(Hc, Wc, 1.2 * U, 26 * U, seed))[..., None]          # 木纹
+    col += 150 * np.exp(-((T - .11) / .045) ** 2)[..., None] * fade             # 亮漆主高光
+    col += 38 * np.exp(-((T - .58) / .12) ** 2)[..., None] * fade               # 下半部环境反光
+    col += 70 * np.exp(-((DX + 2 * U) / (2.2 * U)) ** 2 - ((T - .25) / .3) ** 2)[..., None]   # 顶部凸起高光
     col *= contact_shadow(a)[..., None]
     layer = np.zeros((Hc, Wc, 4), np.float32)
     layer = over(layer, np.dstack([np.clip(col, 0, 255), wood_a * 255]))
-    layer = over(layer, wire(Hc, Wc, hook_path(x0, yt - 6 * U, 6), 2.1 * U))
-    layer = over(layer, ferrule(Hc, Wc, x0, yt - 7.5 * U, 2.8 * U, 4.5 * U))
+    layer = over(layer, wire(Hc, Wc, hook_path(x0, yt - 8 * U, 6.5), 1.9 * U))
+    layer = over(layer, ferrule(Hc, Wc, x0, yt - 9.5 * U, 2.9 * U, 5 * U))
     return over(layer, shirt), dict(top=top, yc=yc, has=has, a=a)
 
 

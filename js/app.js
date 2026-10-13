@@ -9,193 +9,204 @@
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const EASE = "cubic-bezier(.22,.8,.2,1)";
   const pad = (n) => String(n).padStart(2, "0");
+  const isDetail = () => body.classList.contains("is-detail");
 
-  /* ---------- 一件衣服：挂着时是侧面，悬停时逐帧播放 AI 生成的真实转身（侧面 → 正面） ---------- */
-  const TURN_MS = 750;
+  /* ---------- 一件衣服：两层帧条交叉淡化，帧与帧之间也是平滑的 ---------- */
+  const TURN_S = .7;                 // 侧面 → 正面用时
+  const layer = (p, cls) =>
+    `<div class="turn ${cls}" style="background-image:url('${p.turn}');background-size:${p.frames * 100}% 100%"></div>`;
   const face = (p, still = false) => still
     ? `<div class="face"><img src="${p.img}" alt="${p.name}" draggable="false"></div>`
-    : `<div class="face"><div class="turn" role="img" aria-label="${p.name}" style="background-image:url('${p.turn}');background-size:${p.frames * 100}% 100%"></div></div>`;
+    : `<div class="face" role="img" aria-label="${p.name}">${layer(p, "a")}${layer(p, "b")}</div>`;
 
-  /* ---------- 挂上衣服 ---------- */
   rack.style.setProperty("--n", N);
   itemsEl.innerHTML = P.map((p, i) =>
     `<button class="item" data-i="${i}" aria-label="${p.name}"><div class="swing">${face(p)}</div></button>`
   ).join("");
   const items = [...itemsEl.children];
-  P.forEach((p) => { new Image().src = p.turn; });
+  P.forEach((p) => { new Image().src = p.turn; new Image().src = p.img; });
 
-  // 每件衣服的播放状态：f = 当前帧（小数），to = 目标帧
-  const turns = items.map((el, i) => ({ el: el.querySelector(".turn"), n: P[i].frames, f: 0, to: 0 }));
-  function drawFrame(t) {
-    const k = Math.round(t.f);
-    t.el.style.backgroundPosition = `${(k / (t.n - 1)) * 100}% 0`;
-  }
-  let last = 0, running = false;
-  function tick(now) {
-    const dt = Math.min(64, now - (last || now));
-    last = now;
-    let busyAny = false;
-    for (const t of turns) {
-      if (t.f === t.to) continue;
-      const step = (t.n - 1) * dt / (reduce ? 1 : TURN_MS);
-      t.f = t.f < t.to ? Math.min(t.to, t.f + step) : Math.max(t.to, t.f - step);
-      drawFrame(t);
-      if (t.f !== t.to) busyAny = true;
-    }
-    if (busyAny) requestAnimationFrame(tick);
-    else { running = false; last = 0; }
-  }
-  function turnTo(i, front, instant = false) {
-    const t = turns[i];
-    t.to = front ? t.n - 1 : 0;
-    if (instant) { t.f = t.to; drawFrame(t); return; }
-    if (!running) { running = true; requestAnimationFrame(tick); }
-  }
-
-  /* ---------- 尺寸（随窗口变化，现算） ---------- */
+  /* ---------- 尺寸 ---------- */
+  let D;
   function dims() {
     const gh = items[0].offsetHeight * 340 / 390;
-    return { slot: gh * .29, open: gh * 300 / 340 + gh * .08 };
+    D = { gh, slot: gh * .3, open: gh * 300 / 340 + gh * .08 };
+    return D;
   }
+  dims();
   // 第 i 件衣服的中心相对整排中点的位置（h = 正在转正面的那件）
-  function pos(i, h, d) {
+  function pos(i, h) {
     let x = 0;
-    for (let j = 0; j < i; j++) x += j === h ? d.open : d.slot;
-    x += (i === h ? d.open : d.slot) / 2;
-    const total = (N - 1) * d.slot + (h >= 0 ? d.open : d.slot);
+    for (let j = 0; j < i; j++) x += j === h ? D.open : D.slot;
+    x += (i === h ? D.open : D.slot) / 2;
+    const total = (N - 1) * D.slot + (h >= 0 ? D.open : D.slot);
     return x - total / 2;
   }
 
-  /* ---------- 摆动：被挤开的衣服晃一下 ---------- */
-  function currentAngle(el) {
-    const m = getComputedStyle(el).transform;
-    if (!m || m === "none") return 0;
-    const v = m.match(/matrix\(([^)]+)\)/);
-    if (!v) return 0;
-    const [a, b] = v[1].split(",").map(Number);
-    return Math.atan2(b, a) * 180 / Math.PI;
-  }
-  function sway(i, a) {
-    if (reduce || Math.abs(a) < .15) return;
-    const el = items[i].firstElementChild;
-    const from = currentAngle(el);
-    el.getAnimations().forEach((x) => x.cancel());
-    const r = (deg) => ({ transform: `rotate(${deg}deg)` });
-    el.animate([
-      r(from), { ...r(a), offset: .2 }, { ...r(-a * .5), offset: .45 },
-      { ...r(a * .22), offset: .68 }, { ...r(-a * .08), offset: .86 }, r(0),
-    ], { duration: 1400, easing: "ease-in-out" });
+  /* ---------- 物理：位置是弹簧（有惯性、略微冲过头再回来），摆动是真钟摆，外加一直存在的轻微漂浮 ---------- */
+  const K = 55, C = 2 * .58 * Math.sqrt(K);        // 弹簧：约 1 秒停稳
+  const W0 = 4.0, DAMP = 1.0;                       // 钟摆：周期约 1.6 秒，慢慢衰减
+  const S = items.map((el, i) => ({
+    el, swing: el.firstElementChild,
+    a: el.querySelector(".turn.a"), b: el.querySelector(".turn.b"),
+    n: P[i].frames, x: 0, v: 0, th: 0, om: 0, f: 0,
+    p1: Math.random() * 6.28, p2: Math.random() * 6.28, p3: Math.random() * 6.28,
+    lastK: -1, lastOp: -1,
+  }));
+  let hovered = -1;
+  S.forEach((s, i) => { s.x = pos(i, -1); });
+
+  function render(s) {
+    s.el.style.transform = `translate3d(${s.x.toFixed(2)}px,0,0)`;
+    s.swing.style.transform = `rotate(${(s.th * 57.2958).toFixed(3)}deg)`;
+    const k = Math.min(s.n - 1, Math.max(0, Math.floor(s.f)));
+    const k2 = Math.min(s.n - 1, k + 1);
+    const op = Math.round((s.f - k) * 100) / 100;
+    if (k !== s.lastK) {
+      s.a.style.backgroundPosition = `${(k / (s.n - 1)) * 100}% 0`;
+      s.b.style.backgroundPosition = `${(k2 / (s.n - 1)) * 100}% 0`;
+      s.lastK = k;
+    }
+    if (op !== s.lastOp) { s.b.style.opacity = op; s.lastOp = op; }
   }
 
-  /* ---------- 悬停：转正面 + 挤开两边 ---------- */
-  let hovered = -1;
-  function setHover(h, { quiet = false } = {}) {
-    if (h === hovered) return;
-    const d = dims();
-    if (!quiet) {
-      items.forEach((_, i) => {
-        const shift = pos(i, h, d) - pos(i, hovered, d);
-        let a = Math.max(-5, Math.min(5, -shift * .032));
-        if (i === h) a = (hovered >= 0 && hovered > h ? -1 : 1) * 1.6;
-        sway(i, a);
-      });
+  let last = 0, t = 0;
+  function tick(now) {
+    const dt = Math.min(.05, (now - (last || now)) / 1000);
+    last = now; t += dt;
+    const steps = 3, h = dt / steps;
+    for (let i = 0; i < N; i++) {
+      const s = S[i];
+      const target = pos(i, hovered);
+      for (let k = 0; k < steps; k++) {
+        const acc = reduce ? 0 : K * (target - s.x) - C * s.v;
+        if (reduce) { s.x = target; s.v = 0; }
+        else { s.v += acc * h; s.x += s.v * h; }
+        // 挂点加速时衣服往反方向摆；空气里一直有一点点飘
+        const wind = .0055 * Math.sin(.8 * t + s.p1) + .003 * Math.sin(1.9 * t + s.p2);
+        const eq = -acc / D.gh * .0042 + (reduce ? 0 : wind);
+        const al = -W0 * W0 * (s.th - eq) - DAMP * s.om;
+        s.om += al * h; s.th += s.om * h;
+        s.th = Math.max(-.11, Math.min(.11, s.th));
+      }
+      // 转身：悬停的那件转到正面；其它的在侧面附近轻轻扭
+      const idle = (reduce || i === hovered) ? 0 : .55 + .55 * Math.sin(.45 * t + s.p3);
+      const fTo = i === hovered ? s.n - 1 : idle;
+      const rate = (s.n - 1) / TURN_S;
+      const df = fTo - s.f;
+      s.f += Math.abs(df) <= rate * dt ? df : Math.sign(df) * rate * dt;
+      render(s);
     }
-    if (hovered >= 0) { items[hovered].classList.remove("on"); turnTo(hovered, false, quiet); }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  /* ---------- 悬停 ---------- */
+  function placeLabel(fresh) {
+    if (hovered < 0) return;
+    if (fresh) label.style.transition = "none";      // 第一次出现不要从别处滑过来
+    label.style.left = `${rack.offsetLeft + rack.offsetWidth / 2 + pos(hovered, hovered)}px`;
+    if (fresh) { void label.offsetWidth; label.style.transition = ""; }
+  }
+  function setHover(h, { instant = false } = {}) {
+    if (h === hovered) return;
     hovered = h;
+    items.forEach((el, i) => el.classList.toggle("on", i === h));
+    itemsEl.classList.toggle("pointing", h >= 0);
+    if (instant) S.forEach((s, i) => { s.x = pos(i, h); s.v = 0; s.th = 0; s.om = 0; s.f = i === h ? s.n - 1 : 0; render(s); });
     if (h >= 0) {
-      items[h].classList.add("on");
-      turnTo(h, true, quiet);
       label.textContent = P[h].name;
-      const fresh = !label.classList.contains("show");
-      if (fresh) label.style.transition = "none";   // 第一次出现不要从别处滑过来
-      label.style.left = `${rack.offsetLeft + rack.offsetWidth / 2 + pos(h, h, d)}px`;
-      if (fresh) { void label.offsetWidth; label.style.transition = ""; }
+      placeLabel(!label.classList.contains("show"));
       label.classList.add("show");
     } else {
       label.classList.remove("show");
     }
   }
-
+  // 鼠标落在哪件衣服的位置上（按当前目标布局算，避免挤开时来回跳）
+  function hit(e) {
+    const r = itemsEl.getBoundingClientRect();
+    if (e.clientY < r.top || e.clientY > r.bottom) return -1;
+    const x = e.clientX - (r.left + r.width / 2);
+    for (let i = 0; i < N; i++) {
+      const half = (i === hovered ? D.open : D.slot) / 2;
+      if (Math.abs(x - pos(i, hovered)) <= half) return i;
+    }
+    return -1;
+  }
   let pointerOnRack = false;
-  items.forEach((el, i) => {
-    el.addEventListener("mouseenter", () => { if (canHover && !body.classList.contains("is-detail")) setHover(i); });
-    el.addEventListener("focus", () => { if (!body.classList.contains("is-detail")) setHover(i); });
-    el.addEventListener("click", () => {
-      if (body.classList.contains("is-detail")) return;
-      if (canHover || hovered === i) openDetail(i);
-      else { setHover(i); setTimeout(() => openDetail(i), TURN_MS); }   // 手机：先转身再打开
-    });
+  itemsEl.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse" || isDetail()) return;
+    pointerOnRack = true;
+    setHover(hit(e));
   });
-  itemsEl.addEventListener("mouseenter", () => { pointerOnRack = true; });
-  itemsEl.addEventListener("mouseleave", () => {
+  itemsEl.addEventListener("pointerleave", () => {
     pointerOnRack = false;
-    if (!body.classList.contains("is-detail")) setHover(-1);
+    if (!isDetail()) setHover(-1);
+  });
+  itemsEl.addEventListener("click", (e) => {
+    if (isDetail()) return;
+    const i = e.detail === 0 ? -1 : hit(e);              // 键盘回车由按钮自己处理
+    if (i < 0) return;
+    if (canHover || hovered === i) openDetail(i);
+    else { setHover(i); setTimeout(() => openDetail(i), TURN_S * 1000); }   // 手机：先转身再打开
+  });
+  items.forEach((el, i) => {
+    el.addEventListener("focus", () => { if (!isDetail()) setHover(i); });
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDetail(i, true); } });
   });
   itemsEl.addEventListener("focusout", (e) => {
-    if (!itemsEl.contains(e.relatedTarget) && !pointerOnRack && !body.classList.contains("is-detail")) setHover(-1);
+    if (!itemsEl.contains(e.relatedTarget) && !pointerOnRack && !isDetail()) setHover(-1);
   });
 
-  /* ---------- 详情 ---------- */
+  /* ---------- 详情：衣架淡开虚化，衣服在中间淡入放大（参考片约 0.3 秒） ---------- */
   let cur = 0, busy = false;
   function renderDetail(i) {
     dItem.innerHTML = face(P[i], true);
     dCount.textContent = `${pad(i + 1)} / ${pad(N)}`;
     dName.textContent = P[i].name;
   }
-  function flipFrom(rect, reverse) {
-    const t = dItem.getBoundingClientRect();
-    const s = rect.height / t.height;
-    const dx = rect.left + rect.width / 2 - (t.left + t.width * s / 2);
-    const dy = rect.top - t.top;
-    const kf = [{ transform: `translate(${dx}px, ${dy}px) scale(${s})` }, { transform: "none" }];
-    return dItem.animate(reverse ? kf.reverse() : kf, { duration: reduce ? 1 : 650, easing: EASE, fill: reverse ? "forwards" : "none" });
-  }
-  function frontRect(i) {
+  function offsetFromRack(i) {
     const r = items[i].getBoundingClientRect();
-    const gh = r.height * 340 / 390;
-    const w = gh * 300 / 340;
-    return { left: r.left + r.width / 2 - w / 2, top: r.top, width: w, height: r.height };
+    const d = dItem.getBoundingClientRect();
+    return { dx: (r.left + r.width / 2) - (d.left + d.width / 2), dy: r.top - d.top, s: r.height / d.height };
   }
 
-  function openDetail(i) {
-    if (busy) return;
+  function openDetail(i, byKey = false) {
+    if (busy || isDetail()) return;
     cur = i;
     renderDetail(i);
-    const from = frontRect(i);
-    items.forEach((el) => el.classList.remove("picked"));
-    items[i].classList.add("picked");
-    body.classList.add("is-detail");
     dItem.classList.add("show");
+    const o = offsetFromRack(i);
+    body.classList.add("is-detail");
     label.classList.remove("show");
-    flipFrom(from, false);
+    dItem.animate([
+      { opacity: 0, transform: `translate(${o.dx * .35}px, ${o.dy * .35}px) scale(${(.75 + o.s * .25).toFixed(3)})` },
+      { opacity: 1, offset: .45 },
+      { opacity: 1, transform: "none" },
+    ], { duration: reduce ? 1 : 520, easing: EASE });
     $("detail").setAttribute("aria-hidden", "false");
-    $("next").focus({ preventScroll: true });
+    if (byKey) $("next").focus({ preventScroll: true });
   }
 
   function closeDetail() {
-    if (!body.classList.contains("is-detail") || busy) return;
+    if (!isDetail() || busy) return;
     busy = true;
-    // 在虚化背景里瞬间把目标衣服转成正面，好让详情图“飞回”它的位置
-    rack.classList.add("no-anim");
-    setHover(cur, { quiet: true });
-    if (hovered === cur) items[cur].classList.add("on");
-    void rack.offsetWidth;
-    const to = frontRect(cur);
-    rack.classList.remove("no-anim");
+    // 背景里那件直接摆成正面，衣架淡回来时衣服就在原位
+    setHover(cur, { instant: true });
     body.classList.remove("is-detail");
     $("detail").setAttribute("aria-hidden", "true");
-    flipFrom(to, true).finished.then(() => {
-      items[cur].classList.remove("picked");
+    dItem.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(.94)" }],
+      { duration: reduce ? 1 : 320, easing: "ease-in", fill: "forwards" }).finished.then(() => {
       dItem.classList.remove("show");
       dItem.getAnimations().forEach((a) => a.cancel());
       busy = false;
-      if (!pointerOnRack) setTimeout(() => { if (!pointerOnRack && !body.classList.contains("is-detail")) setHover(-1); }, 700);
-      items[cur].focus({ preventScroll: true });
+      if (!pointerOnRack) setTimeout(() => { if (!pointerOnRack && !isDetail()) setHover(-1); }, 600);
+      if (document.activeElement && document.activeElement.closest && document.activeElement.closest(".detail, .top")) items[cur].focus({ preventScroll: true });
     });
   }
 
   async function step(dir) {
-    if (busy || !body.classList.contains("is-detail")) return;
+    if (busy || !isDetail()) return;
     busy = true;
     const next = (cur + dir + N) % N;
     const out = dItem.animate([
@@ -204,9 +215,7 @@
     ], { duration: reduce ? 1 : 200, easing: "ease-in", fill: "forwards" });
     dName.style.opacity = 0;
     await out.finished;
-    items[cur].classList.remove("picked");
     cur = next;
-    items[cur].classList.add("picked");
     renderDetail(cur);
     out.cancel();
     dName.style.opacity = 1;
@@ -250,7 +259,5 @@
   const wrap = $("rackWrap");
   if (wrap.scrollWidth > wrap.clientWidth) wrap.scrollLeft = (wrap.scrollWidth - wrap.clientWidth) / 2;
 
-  window.addEventListener("resize", () => {
-    if (hovered >= 0) label.style.left = `${rack.offsetLeft + rack.offsetWidth / 2 + pos(hovered, hovered, dims())}px`;
-  });
+  window.addEventListener("resize", () => { dims(); placeLabel(false); });
 })();

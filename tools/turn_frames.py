@@ -4,7 +4,7 @@
 
 前提：视频首帧 = 即梦上传 / first_NN.png（3:4，衣服画布按 0.86 高度、顶部 5% 摆放）。
 据此把每帧裁回网站坐标（300×406 单位：顶部 = 挂杆中心上方 16 单位），所以挂钩位置跟网站完全对齐。
---end 不填时自动找「最侧」的那一帧（衣服最窄）当终点。
+--end 不填时自动找第一次窄到正面宽度 30% 的那一帧当终点（--side 0.3 可调）。
 """
 import subprocess
 import sys
@@ -69,6 +69,9 @@ def main():
     end_s = None
     if "--frames" in a:
         i = a.index("--frames"); n_out = int(a[i + 1]); del a[i:i + 2]
+    side_ratio = .3
+    if "--side" in a:
+        i = a.index("--side"); side_ratio = float(a[i + 1]); del a[i:i + 2]
     if "--end" in a:
         i = a.index("--end"); end_s = float(a[i + 1]); del a[i:i + 2]
     src, dst = Path(a[0]), Path(a[1])
@@ -84,10 +87,9 @@ def main():
             m = (np.abs(g - bg).max(2) > 14)
             widths.append(int((m.sum(0) > 8).sum()))
         widths = np.array(widths)
-        thr = widths.min() * 1.15
-        first = int(np.argmax(widths <= thr))
-        win = widths[first:first + 14]
-        end = first + int(np.argmin(win))
+        # 参考片的「侧挂」不是正 90°：大约是正面宽度的 30%，看得到袖子和木衣架头
+        thr = max(widths.min() * 1.05, widths[0] * side_ratio)
+        end = int(np.argmax(widths <= thr))
     print("end frame", end, f"({end / fps:.2f}s)")
 
     pick = np.linspace(end, 0, n_out).round().astype(int)        # 倒放：侧面 → 正面
@@ -100,6 +102,13 @@ def main():
     sprite = Image.new("RGBA", (OUT_W * n_out, OUT_H), (0, 0, 0, 0))
     M = np.float32([[OUT_W / cw, 0, -x0 * OUT_W / cw], [0, OUT_H / ch, -y0 * OUT_H / ch]])
     for k, (f, al) in enumerate(zip(sel, alphas)):
+        # 去白边：边缘收 1px，再把半透明像素里混进去的背景灰减掉（背景色已知）
+        al = cv2.erode(al, np.ones((3, 3), np.uint8)).astype(np.float32)
+        g = f.astype(np.float32)
+        bg = np.median(np.concatenate([g[:20].reshape(-1, 3), g[-20:].reshape(-1, 3)]), 0)
+        a1 = (al / 255)[..., None]
+        fg = np.where(a1 > .03, (g - (1 - a1) * bg) / np.maximum(a1, .03), g)
+        f = np.clip(fg, 0, 255).astype(np.uint8)
         rgba = np.dstack([f, al.astype(np.uint8)])
         warped = cv2.warpAffine(rgba, M, (OUT_W, OUT_H), flags=cv2.INTER_AREA, borderValue=(0, 0, 0, 0))
         sprite.paste(Image.fromarray(warped, "RGBA"), (k * OUT_W, 0))

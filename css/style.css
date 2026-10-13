@@ -29,7 +29,7 @@
   --fw: calc(var(--gh) * 300 / 340);    /* 衣服正面宽 */
   --slot: calc(var(--gh) * .3);         /* 转开挂着时每件占的位置 */
   --open: calc(var(--fw) + var(--gh) * .08); /* 转正面后占的位置 */
-  --rodh: max(9px, calc(var(--gh) * .036));
+  --rodh: max(10px, calc(var(--gh) * .042));
 }
 
 * { box-sizing: border-box; }
@@ -75,7 +75,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .scene { position: relative; display: grid; place-items: center; min-height: 0; }
 .rack-wrap {
   position: relative; margin-top: -4vh;
-  transition: filter .6s var(--ease), opacity .6s var(--ease), transform .6s var(--ease);
+  transition: filter .38s var(--ease), opacity .38s var(--ease), transform .38s var(--ease);
 }
 .rack {
   position: relative;
@@ -99,30 +99,37 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   position: absolute; top: 50%; height: var(--rodh); transform: translateY(-50%);
   left: calc(var(--rodh) * 5.3 * .5 * .8); right: calc(var(--rodh) * 5.3 * .5 * .8);
   border-radius: 99px;
+  /* 抛光镀铬：竖向是圆管的明暗（上亮下暗、底边回光），横向乘上环境反光（两端亮、中段一大片深色） */
   background:
-    linear-gradient(90deg, rgba(30, 30, 40, 0) 26%, rgba(30, 30, 40, .26) 38%, rgba(30, 30, 40, .3) 52%, rgba(30, 30, 40, 0) 64%),
-    linear-gradient(180deg, #8c8c92 0%, #d8d8dc 11%, #ffffff 25%, #e8e8eb 34%, #b6b6bb 50%, #8a8a90 67%, #6c6c72 82%, #9a9aa0 92%, #5c5c62 100%);
-  box-shadow: 0 calc(var(--rodh) * .9) calc(var(--rodh) * .8) calc(var(--rodh) * -.35) rgba(0, 0, 0, .28);
+    linear-gradient(90deg, #fff 0%, #fff 22%, #c4c4c8 30%, #6a6a70 38%, #58585e 52%, #6c6c72 64%, #d9d9dc 74%, #fff 80%, #c9c9cd 88%, #fff 96%),
+    linear-gradient(180deg, #8e8e93 0%, #ffffff 11%, #ffffff 24%, #ececef 34%, #b4b4b9 48%, #707076 63%, #4a4a50 77%, #8a8a90 88%, #f0f0f2 95%, #707075 100%);
+  background-blend-mode: multiply;
+  box-shadow: 0 calc(var(--rodh) * 1.1) calc(var(--rodh) * .9) calc(var(--rodh) * -.4) rgba(0, 0, 0, .3);
 }
-.tube::after {   /* 一道长高光 */
-  content: ""; position: absolute; left: 8%; right: 12%; top: 22%; height: 16%;
+.tube::before {   /* 顶部一条贯穿的镜面亮线 */
+  content: ""; position: absolute; left: 1%; right: 1%; top: 14%; height: 13%;
   border-radius: 99px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .95) 18%, rgba(255, 255, 255, .5) 34%, transparent 42%, transparent 62%, rgba(255, 255, 255, .85) 78%, transparent);
+  background: linear-gradient(90deg, rgba(255, 255, 255, .95), rgba(255, 255, 255, .95) 12%, rgba(255, 255, 255, .55) 30%, rgba(255, 255, 255, .45) 55%, rgba(255, 255, 255, .7) 80%, rgba(255, 255, 255, .95));
+}
+.tube::after {   /* 底边一道细回光 */
+  content: ""; position: absolute; left: 2%; right: 2%; bottom: 7%; height: 8%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, .8), rgba(255, 255, 255, .25) 30%, rgba(255, 255, 255, .2) 60%, rgba(255, 255, 255, .7));
 }
 
 /* ---------- 衣服 ---------- */
+/* 衣服的位置、摆动、转身都由 js 里的物理模拟逐帧设置 */
 .items {
   position: absolute; left: 0; right: 0; top: 0; z-index: 2;
-  display: flex; justify-content: center;
+  height: calc(var(--hook) + var(--gh));
 }
+.items.pointing { cursor: pointer; }
 .item {
-  position: relative; flex: 0 0 auto;
-  width: var(--slot); height: calc(var(--hook) + var(--gh));
-  transition: width .5s var(--ease);
-  outline: none;
+  position: absolute; left: 50%; top: 0;
+  width: var(--slot); height: calc(var(--hook) + var(--gh)); margin-left: calc(var(--slot) / -2);
+  pointer-events: none; outline: none; will-change: transform;
 }
-.item.on { width: var(--open); z-index: 2; }
-.item.picked .face { visibility: hidden; }
+.item.on { z-index: 2; }
 .item:focus-visible::after {
   content: ""; position: absolute; left: 50%; bottom: -14px; width: 16px; height: 2px;
   margin-left: -8px; background: var(--ink); border-radius: 2px;
@@ -144,6 +151,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .face .turn { height: calc(var(--gh) * 440 / 340); }   /* 帧条底部多留 34 单位给下垂的布料 */
 .face { pointer-events: none; }   /* 画布比挂位宽，不能挡住旁边那件的鼠标 */
 .face .turn { background-repeat: no-repeat; background-position: 0 0; }
+.face .turn.b { opacity: 0; }      /* 下一帧叠在上面按比例淡入：帧与帧之间平滑过渡 */
+.swing { will-change: transform; }
 .face img { user-select: none; -webkit-user-drag: none; pointer-events: none; }
 
 .hover-label {
@@ -192,6 +201,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 .arrow svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .arrow:hover { background: var(--ink); color: var(--bg); }
+.arrow:focus { outline: none; }
+.arrow:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .arrow.prev { left: calc(50% - min(50vh, 36vw) * 150 / 340 - 7vw - 38px); }
 .arrow.next { left: calc(50% + min(50vh, 36vw) * 150 / 340 + 7vw); }
 .d-meta { position: absolute; left: 0; right: 0; bottom: calc(4.5vh + 62px); text-align: center; }
@@ -203,7 +214,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .no-anim .item { transition: none !important; }
 
 /* 进入详情后的整体状态 */
-body.is-detail .rack-wrap { filter: blur(14px); opacity: .3; transform: scale(.985); pointer-events: none; }
+body.is-detail .rack-wrap { filter: blur(9px); opacity: .34; transform: scale(1.01); pointer-events: none; }
 body.is-detail .detail { pointer-events: auto; }
 body.is-detail .arrow, body.is-detail .d-meta { opacity: 1; }
 body.is-detail .nav-link, body.is-detail .logo { opacity: 0; pointer-events: none; }
