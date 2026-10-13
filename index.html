@@ -8,16 +8,24 @@
   <link rel="icon" href="assets/logo.png">
   <link rel="preload" href="assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/studio.css">
 </head>
 <body>
+  <a class="skip-link" href="#collection">Skip to collection</a>
   <header class="top">
     <button class="nav-link" data-panel="about">About</button>
     <a class="logo" href="./" aria-label="your present"></a>
     <button class="nav-link" data-panel="contact">Contact</button>
-    <button class="close-link" id="close">Close</button>
+    <button class="close-link" id="close" inert>Close</button>
   </header>
 
-  <main class="scene">
+  <main class="scene" id="collection">
+    <section class="intro" aria-labelledby="collectionTitle">
+      <p class="eyebrow">THE EVERYDAY COLLECTION <span>— VOL. 01</span></p>
+      <h1 id="collectionTitle">A little more <em>you.</em></h1>
+      <p class="intro-note">Drawn with a point of view.<br>Made for right now.</p>
+    </section>
+    <p class="loading-note" id="loadingNote" role="status">Preparing the wardrobe…</p>
     <div class="rack-wrap" id="rackWrap">
       <div class="rack" id="rack">
         <div class="rod" aria-hidden="true">
@@ -30,20 +38,20 @@
         <svg class="bracket l" viewBox="0 0 46 92" aria-hidden="true">
           <rect x="2" y="3" width="27" height="86" rx="6" fill="url(#ypPlate)" stroke="rgba(0,0,0,.22)" stroke-width=".8"/>
           <rect x="3.2" y="4.2" width="24.6" height="83.6" rx="5" fill="none" stroke="rgba(255,255,255,.55)" stroke-width=".8"/>
-          <g><circle cx="15.5" cy="14" r="3.8" fill="url(#ypScrew)" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><path d="M13 14.6h5" stroke="rgba(0,0,0,.45)" stroke-width=".9"/></g>
-          <g><circle cx="15.5" cy="78" r="3.8" fill="url(#ypScrew)" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><path d="M13 78.6h5" stroke="rgba(0,0,0,.45)" stroke-width=".9"/></g>
+          <g><circle cx="15.5" cy="14" r="3.8" fill="url(#ypScrew)" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><path d="M13.7 16l3.6-3.6" stroke="rgba(0,0,0,.45)" stroke-width=".9"/></g>
+          <g><circle cx="15.5" cy="78" r="3.8" fill="url(#ypScrew)" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><path d="M13.7 80l3.6-3.6" stroke="rgba(0,0,0,.45)" stroke-width=".9"/></g>
           <rect x="17" y="32" width="29" height="28" rx="3.5" fill="url(#ypCup)" stroke="rgba(0,0,0,.25)" stroke-width=".7"/>
           <rect x="21" y="32" width="2.2" height="28" fill="rgba(255,255,255,.55)"/>
-          <rect x="40" y="32" width="1.4" height="28" fill="rgba(0,0,0,.18)"/>
+          <rect x="40" y="32" width="1.4" height="28" fill="rgba(0,0,0,.3)"/><path d="M44 34v24" stroke="#fff" stroke-opacity=".8" stroke-width="1.2"/>
         </svg>
         <svg class="bracket r" viewBox="0 0 46 92" aria-hidden="true">
           <rect x="2" y="3" width="27" height="86" rx="6" fill="url(#ypPlate)" stroke="rgba(0,0,0,.22)" stroke-width=".8"/>
           <rect x="3.2" y="4.2" width="24.6" height="83.6" rx="5" fill="none" stroke="rgba(255,255,255,.55)" stroke-width=".8"/>
-          <g><circle cx="15.5" cy="14" r="3.8" fill="url(#ypScrew)" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><path d="M13 14.6h5" stroke="rgba(0,0,0,.45)" stroke-width=".9"/></g>
-          <g><circle cx="15.5" cy="78" r="3.8" fill="url(#ypScrew)" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><path d="M13 78.6h5" stroke="rgba(0,0,0,.45)" stroke-width=".9"/></g>
+          <g><circle cx="15.5" cy="14" r="3.8" fill="url(#ypScrew)" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><path d="M13.7 16l3.6-3.6" stroke="rgba(0,0,0,.45)" stroke-width=".9"/></g>
+          <g><circle cx="15.5" cy="78" r="3.8" fill="url(#ypScrew)" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><path d="M13.7 80l3.6-3.6" stroke="rgba(0,0,0,.45)" stroke-width=".9"/></g>
           <rect x="17" y="32" width="29" height="28" rx="3.5" fill="url(#ypCup)" stroke="rgba(0,0,0,.25)" stroke-width=".7"/>
           <rect x="21" y="32" width="2.2" height="28" fill="rgba(255,255,255,.55)"/>
-          <rect x="40" y="32" width="1.4" height="28" fill="rgba(0,0,0,.18)"/>
+          <rect x="40" y="32" width="1.4" height="28" fill="rgba(0,0,0,.3)"/><path d="M44 34v24" stroke="#fff" stroke-opacity=".8" stroke-width="1.2"/>
         </svg>
       </div>
         <div class="items" id="items"></div>
@@ -51,17 +59,22 @@
       <p class="hover-label" id="hoverLabel" aria-live="polite"></p>
     </div>
 
-    <section class="detail" id="detail" aria-hidden="true">
+    <section class="detail" id="detail" role="dialog" aria-modal="true" aria-labelledby="dName" aria-hidden="true" inert>
       <button class="arrow prev" id="prev" aria-label="Previous">
         <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6M9 12h12" transform="translate(-1.5 0)"/></svg>
       </button>
-      <div class="d-stage"><div class="d-item" id="dItem"></div></div>
+      <div class="d-stage"><button class="zoom-toggle" id="zoomToggle" aria-label="Enlarge garment" aria-pressed="false"><div class="d-item" id="dItem"></div></button><span class="zoom-hint sr-only" id="zoomHint">Click to look closer ↗</span></div>
       <button class="arrow next" id="next" aria-label="Next">
         <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6M15 12H3" transform="translate(1.5 0)"/></svg>
       </button>
       <div class="d-meta">
-        <p class="d-count" id="dCount">01 / 10</p>
+        <p class="d-count" id="dCount">01 / 09</p>
         <h2 class="d-name" id="dName"></h2>
+        <p class="d-description">A drawing, a favourite tee.<br>A little something to make your own.</p>
+        <div class="d-spec"><span>Collection</span><span>The everyday edit</span></div>
+        <div class="d-spec"><span>Availability</span><span>Coming soon</span></div>
+        <button class="detail-availability" data-panel="availability">Explore availability <span aria-hidden="true">↗</span></button>
+
       </div>
     </section>
 
@@ -72,27 +85,27 @@
   </main>
 
   <footer class="marquee" aria-label="Welcome. Your present.">
-    <div class="marquee-track" id="marquee"></div>
+    <div class="marquee-track" id="marquee" aria-hidden="true"><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span><span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span></div>
   </footer>
 
-  <div class="sheet" id="sheet" aria-hidden="true">
-    <div class="sheet-card" role="dialog" aria-modal="true">
+  <div class="sheet" id="sheet" aria-hidden="true" inert>
+    <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
       <div class="sheet-body" id="sheetBody"></div>
       <button class="pill small" id="sheetClose">Close</button>
     </div>
   </div>
 
   <template id="panel-about">
-    <h3>About</h3>
+    <h3 id="sheetTitle">About</h3>
     <p>your present makes clothes for right now. Every piece starts as a drawing and ends up on this rack.</p>
   </template>
   <template id="panel-contact">
-    <h3>Contact</h3>
+    <h3 id="sheetTitle">Contact</h3>
     <p>Collabs, wholesale or just saying hi — contact details coming soon.</p>
   </template>
   <template id="panel-availability">
-    <h3>Availability</h3>
-    <p>Sizes S – XL. First drop opening soon. Subscribe to our newsletter to hear first.</p>
+    <h3 id="sheetTitle">Availability</h3>
+    <p>The first drop is on its way. Size options and release details will be shared here when the collection opens.</p>
   </template>
 
   <script src="data/products.js"></script>

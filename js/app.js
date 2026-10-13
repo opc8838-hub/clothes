@@ -24,7 +24,7 @@
     `<button class="item" data-i="${i}" aria-label="${p.name}"><div class="swing">${face(p)}</div></button>`
   ).join("");
   const items = [...itemsEl.children];
-  P.forEach((p) => { new Image().src = p.turn; new Image().src = p.img; });
+
 
   /* ---------- 尺寸 ---------- */
   let D;
@@ -43,33 +43,37 @@
     return x - total / 2;
   }
 
-  /* ---------- 物理：位置是弹簧（有惯性、略微冲过头再回来），摆动是真钟摆，外加一直存在的轻微漂浮 ---------- */
-  const K = 55, C = 2 * .58 * Math.sqrt(K);        // 弹簧：约 1 秒停稳
-  const W0 = 4.0, DAMP = 1.0;                       // 钟摆：周期约 1.6 秒，慢慢衰减
+  /* ---------- Restore the responsive rail spring; settle when interaction ends. ---------- */
+  const K = 55, C = 2 * .58 * Math.sqrt(K);        // Original rail response.
+  const W0 = 4, DAMP = 1.8;                       // A light, decaying hanger swing.
   const S = items.map((el, i) => ({
     el, swing: el.firstElementChild,
     a: el.querySelector(".turn.a"),
     n: P[i].frames, x: 0, v: 0, th: 0, om: 0, f: 0,
-    p1: Math.random() * 6.28, p2: Math.random() * 6.28, p3: Math.random() * 6.28,
     lastK: -1,
   }));
-  let hovered = -1;
-  S.forEach((s, i) => { s.x = pos(i, -1); });
+  let selected = Math.floor(N / 2);
+  let hovered = selected;
+  S.forEach((s, i) => { s.x = pos(i, hovered); s.f = i === hovered ? s.n - 1 : 0; });
 
   function render(s) {
     s.el.style.transform = `translate3d(${s.x.toFixed(2)}px,0,0)`;
     s.swing.style.transform = `rotate(${(s.th * 57.2958).toFixed(3)}deg)`;
+    // Frames already contain the source motion. Play them at a uniform cadence.
     const k = Math.min(s.n - 1, Math.max(0, Math.round(s.f)));   // 只显示一帧：两帧叠加会出重影
     if (k !== s.lastK) {
-      s.a.style.backgroundPosition = `${(k / (s.n - 1)) * 100}% 0`;
+      s.a.style.backgroundPosition = `${s.n > 1 ? (k / (s.n - 1)) * 100 : 0}% 0`;
       s.lastK = k;
     }
   }
 
-  let last = 0, t = 0;
+  let last = 0, raf = 0;
+  function wake() { if (!raf && !document.hidden) { last = performance.now(); raf = requestAnimationFrame(tick); } }
   function tick(now) {
     const dt = Math.min(.05, (now - (last || now)) / 1000);
-    last = now; t += dt;
+    last = now;
+    raf = 0;
+    let moving = false;
     const steps = 3, h = dt / steps;
     for (let i = 0; i < N; i++) {
       const s = S[i];
@@ -78,23 +82,24 @@
         const acc = reduce ? 0 : K * (target - s.x) - C * s.v;
         if (reduce) { s.x = target; s.v = 0; }
         else { s.v += acc * h; s.x += s.v * h; }
-        // 挂点加速时衣服往反方向摆；空气里一直有一点点飘
-        const wind = .0055 * Math.sin(.8 * t + s.p1) + .003 * Math.sin(1.9 * t + s.p2);
-        const eq = -acc / D.gh * .0042 + (reduce ? 0 : wind);
+        // Only react to a moving hanger; settle completely when the rail is still.
+        const eq = reduce ? 0 : -acc / D.gh * .0042;
         const al = -W0 * W0 * (s.th - eq) - DAMP * s.om;
         s.om += al * h; s.th += s.om * h;
-        s.th = Math.max(-.11, Math.min(.11, s.th));
+        s.th = Math.max(-.08, Math.min(.08, s.th));
       }
       // 转身：悬停的那件转到正面，其它的停在侧面
       const fTo = i === hovered ? s.n - 1 : 0;
       const rate = (s.n - 1) / TURN_S;
       const df = fTo - s.f;
-      s.f += Math.abs(df) <= rate * dt ? df : Math.sign(df) * rate * dt;
+      s.f += reduce || Math.abs(df) <= rate * dt ? df : Math.sign(df) * rate * dt;
+      if (Math.abs(s.x - target) > .02 || Math.abs(s.v) > .03 || Math.abs(s.th) > .0001 || Math.abs(s.om) > .0001 || Math.abs(s.f - fTo) > .001) moving = true;
       render(s);
     }
-    requestAnimationFrame(tick);
+    if (moving && !document.hidden) raf = requestAnimationFrame(tick);
   }
-  requestAnimationFrame(tick);
+  wake();
+  document.addEventListener("visibilitychange", () => { if (document.hidden) { cancelAnimationFrame(raf); raf = 0; } else wake(); });
 
   /* ---------- 悬停 ---------- */
   function placeLabel(fresh) {
@@ -104,8 +109,11 @@
     if (fresh) { void label.offsetWidth; label.style.transition = ""; }
   }
   function setHover(h, { instant = false } = {}) {
-    if (h === hovered) return;
+    if (h < 0) h = selected;
+    if (h === hovered && !instant) return;
     hovered = h;
+    if (h >= 0) selected = h;
+    wake();
     items.forEach((el, i) => el.classList.toggle("on", i === h));
     itemsEl.classList.toggle("pointing", h >= 0);
     if (instant) S.forEach((s, i) => { s.x = pos(i, h); s.v = 0; s.th = 0; s.om = 0; s.f = i === h ? s.n - 1 : 0; render(s); });
@@ -129,10 +137,14 @@
     return -1;
   }
   let pointerOnRack = false;
+  let touchStart = null;
+  itemsEl.addEventListener("pointerdown", e => { touchStart = { x: e.clientX, y: e.clientY }; });
   itemsEl.addEventListener("pointermove", (e) => {
     if (e.pointerType !== "mouse" || isDetail()) return;
     pointerOnRack = true;
-    setHover(hit(e));
+    const target = hit(e);
+    setHover(target);
+
   });
   itemsEl.addEventListener("pointerleave", () => {
     pointerOnRack = false;
@@ -140,10 +152,11 @@
   });
   itemsEl.addEventListener("click", (e) => {
     if (isDetail()) return;
+    if (touchStart && Math.hypot(e.clientX - touchStart.x, e.clientY - touchStart.y) > 12) return;
     const i = e.detail === 0 ? -1 : hit(e);              // 键盘回车由按钮自己处理
     if (i < 0) return;
     if (canHover || hovered === i) openDetail(i);
-    else { setHover(i); setTimeout(() => openDetail(i), TURN_S * 1000); }   // 手机：先转身再打开
+    else { setHover(i); openDetail(i); }   // 手机：先转身再打开
   });
   items.forEach((el, i) => {
     el.addEventListener("focus", () => { if (!isDetail()) setHover(i); });
@@ -154,8 +167,12 @@
   });
 
   /* ---------- 详情：衣架淡开虚化，衣服在中间淡入放大（参考片约 0.3 秒） ---------- */
-  let cur = 0, busy = false;
+  let cur = 0, busy = false, detailOpener = null;
+  const zoomToggle = $("zoomToggle");
+  function resetZoom() { zoomToggle.setAttribute("aria-pressed", "false"); zoomToggle.setAttribute("aria-label", "Enlarge garment"); $("zoomHint").textContent = "Click to look closer ↗"; }
+  zoomToggle.addEventListener("click", () => { const zoomed = zoomToggle.getAttribute("aria-pressed") !== "true"; zoomToggle.setAttribute("aria-pressed", String(zoomed)); zoomToggle.setAttribute("aria-label", zoomed ? "Show full garment" : "Enlarge garment"); $("zoomHint").textContent = zoomed ? "Click to show full piece ↙" : "Click to look closer ↗"; });
   function renderDetail(i) {
+    resetZoom();
     dItem.innerHTML = face(P[i], true);
     dCount.textContent = `${pad(i + 1)} / ${pad(N)}`;
     dName.textContent = P[i].name;
@@ -168,6 +185,7 @@
 
   function openDetail(i, byKey = false) {
     if (busy || isDetail()) return;
+    detailOpener = document.activeElement;
     cur = i;
     renderDetail(i);
     dItem.classList.add("show");
@@ -180,7 +198,12 @@
       { opacity: 1, transform: "none" },
     ], { duration: reduce ? 1 : 520, easing: EASE });
     $("detail").setAttribute("aria-hidden", "false");
-    if (byKey) $("next").focus({ preventScroll: true });
+    $("detail").inert = false;
+    $("rackWrap").inert = true;
+    $("cta").inert = true;
+    document.querySelectorAll(".nav-link, .logo").forEach(el => el.inert = true);
+    $("close").inert = false;
+    $("close").focus({ preventScroll: true });
   }
 
   function closeDetail() {
@@ -189,6 +212,13 @@
     // 背景里那件直接摆成正面，衣架淡回来时衣服就在原位
     setHover(cur, { instant: true });
     body.classList.remove("is-detail");
+    $("close").inert = true;
+    $("detail").inert = true;
+    $("rackWrap").inert = false;
+    $("cta").inert = false;
+    document.querySelectorAll(".nav-link, .logo").forEach(el => el.inert = false);
+    resetZoom();
+    detailOpener?.focus({ preventScroll: true });
     $("detail").setAttribute("aria-hidden", "true");
     dItem.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(.94)" }],
       { duration: reduce ? 1 : 320, easing: "ease-in", fill: "forwards" }).finished.then(() => {
@@ -196,7 +226,7 @@
       dItem.getAnimations().forEach((a) => a.cancel());
       busy = false;
       if (!pointerOnRack) setTimeout(() => { if (!pointerOnRack && !isDetail()) setHover(-1); }, 600);
-      if (document.activeElement && document.activeElement.closest && document.activeElement.closest(".detail, .top")) items[cur].focus({ preventScroll: true });
+
     });
   }
 
@@ -205,9 +235,9 @@
     busy = true;
     const next = (cur + dir + N) % N;
     const out = dItem.animate([
-      { opacity: 1, filter: "blur(0px)", transform: "none" },
-      { opacity: 0, filter: "blur(10px)", transform: `translateX(${-dir * 28}px)` },
-    ], { duration: reduce ? 1 : 200, easing: "ease-in", fill: "forwards" });
+      { opacity: 1, transform: "none" },
+      { opacity: 0, transform: `translateX(${-dir * 28}px)` },
+    ], { duration: reduce ? 1 : 140, easing: "ease-in", fill: "forwards" });
     dName.style.opacity = 0;
     await out.finished;
     cur = next;
@@ -215,9 +245,9 @@
     out.cancel();
     dName.style.opacity = 1;
     await dItem.animate([
-      { opacity: 0, filter: "blur(10px)", transform: `translateX(${dir * 28}px)` },
-      { opacity: 1, filter: "blur(0px)", transform: "none" },
-    ], { duration: reduce ? 1 : 380, easing: EASE }).finished;
+      { opacity: 0, transform: `translateX(${dir * 28}px)` },
+      { opacity: 1, transform: "none" },
+    ], { duration: reduce ? 1 : 280, easing: EASE }).finished;
     busy = false;
   }
 
@@ -227,13 +257,17 @@
 
   /* ---------- About / Contact / Availability 小卡片 ---------- */
   const sheet = $("sheet");
+  let sheetOpener = null;
   function openSheet(name) {
+    sheetOpener = document.activeElement;
     $("sheetBody").innerHTML = $(`panel-${name}`).innerHTML;
+    sheet.inert = false;
+    [document.querySelector(".top"), document.querySelector("main"), document.querySelector("footer"), $("detail")].forEach(el => el.inert = true);
     sheet.classList.add("open");
     sheet.setAttribute("aria-hidden", "false");
     $("sheetClose").focus({ preventScroll: true });
   }
-  function closeSheet() { sheet.classList.remove("open"); sheet.setAttribute("aria-hidden", "true"); }
+  function closeSheet() { sheet.classList.remove("open"); sheet.inert = true; [document.querySelector(".top"), document.querySelector("main"), document.querySelector("footer")].forEach(el => el.inert = false); $("detail").inert = !isDetail(); sheetOpener?.focus({ preventScroll: true }); sheet.setAttribute("aria-hidden", "true"); }
   document.querySelectorAll("[data-panel]").forEach((b) => b.addEventListener("click", () => openSheet(b.dataset.panel)));
   $("cta").addEventListener("click", () => openSheet("availability"));
   $("sheetClose").addEventListener("click", closeSheet);
@@ -241,18 +275,36 @@
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") { if (sheet.classList.contains("open")) closeSheet(); else closeDetail(); }
+    if (e.key === "Tab" && (sheet.classList.contains("open") || isDetail())) {
+      const scope = sheet.classList.contains("open") ? sheet : $("detail");
+      const focusable = [...scope.querySelectorAll("button, a[href], [tabindex=\"0\"]")].filter(el => !el.disabled && !el.closest("[inert]"));
+      if (scope === $("detail")) focusable.unshift($("close"));
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
     if (sheet.classList.contains("open")) return;
     if (e.key === "ArrowRight") step(1);
     if (e.key === "ArrowLeft") step(-1);
   });
 
-  /* ---------- 跑马灯 ---------- */
-  const unit = '<span>“Welcome”</span><span class="dot">✦</span><span>“Your present”</span><span class="dot">✦</span>';
-  $("marquee").innerHTML = unit.repeat(8) + unit.repeat(8);
-
-  // 手机上衣架比屏幕宽：打开时先滚到中间
-  const wrap = $("rackWrap");
-  if (wrap.scrollWidth > wrap.clientWidth) wrap.scrollLeft = (wrap.scrollWidth - wrap.clientWidth) / 2;
-
-  window.addEventListener("resize", () => { dims(); placeLabel(false); });
+  function centerSelected(instant = false) {
+    const wrap = $("rackWrap");
+    if (wrap.scrollWidth > wrap.clientWidth) wrap.scrollTo({ left: rack.offsetLeft + rack.offsetWidth / 2 + pos(selected, hovered) - wrap.clientWidth / 2, behavior: instant || reduce ? 'instant' : 'smooth' });
+  }
+  setHover(selected, { instant: true });
+  centerSelected(true);
+  Promise.all(P.map((p,i) => new Promise(resolve => {
+    const img = new Image();
+    img.onload = async () => {
+      // A loaded sprite is not necessarily decoded. Finish decoding before interaction.
+      try { await img.decode(); } catch { /* The loaded image remains usable. */ }
+      resolve();
+    };
+    img.onerror = () => { S[i].a.style.backgroundImage = 'url("' + p.img + '")'; S[i].a.style.backgroundSize = '100% 100%'; S[i].a.style.height = 'calc(var(--gh) * 406 / 340)'; S[i].n = 1; S[i].f = 0; resolve(); };
+    img.src = p.turn;
+    const front = new Image(); front.src = p.img;
+    front.decode().catch(() => {});
+  }))).then(() => { body.classList.add("is-ready"); wake(); });
+  window.addEventListener("resize", () => { dims(); placeLabel(false); wake(); centerSelected(true); });
 })();
