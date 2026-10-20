@@ -30,7 +30,9 @@ window.FASHION_GALLERY = (() => {
     ['S07','turn','侧身回望'],['S08','overhead','俯拍造型'],['S09','cover','封面定格']
   ];
   for (const [id,slug,title] of shots) {
+    if(!['S04','S07','S09'].includes(id))continue;
     for (const [frame,label] of [['first','首帧'],['last','尾帧']]) {
+      if(frame==='last')continue;
       const file = `shot-${id}-${slug}-${frame}-frame`;
       const entry = image(`${id}-${frame}`,'shot',file,`${id} ${title} · ${label}`,'静态镜头输入；视频状态单独核对。');
       entry.shot=id; entry.frame=frame;

@@ -22,7 +22,7 @@
   };
   const decode = (path, video=false) => new Promise(resolve => {
     const media = video ? document.createElement('video') : new Image();
-    const timer = setTimeout(()=>finish(false),12000);
+    const timer = setTimeout(()=>finish(false),video?45000:20000);
     function finish(ok) {
       clearTimeout(timer); media.onload=media.onerror=media.onloadedmetadata=null;
       if(video){media.removeAttribute('src');media.load();}
