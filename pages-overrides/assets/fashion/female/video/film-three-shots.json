@@ -1,0 +1,38 @@
+{
+  "title": "一件衣服，一段生活 · 三镜短片",
+  "status": "edited_from_three_real_generated_videos",
+  "duration_seconds": 12,
+  "width": 720,
+  "height": 1280,
+  "fps": 24,
+  "audio": "silent",
+  "sequence": [
+    {
+      "id": "S04",
+      "timeline_in": 0,
+      "timeline_out": 4,
+      "source_in": 0.5,
+      "source_duration": 5.184,
+      "task_id": "453995391877565"
+    },
+    {
+      "id": "S07",
+      "timeline_in": 4,
+      "timeline_out": 8,
+      "source_in": 0.35,
+      "source_duration": 5.184,
+      "task_id": "454479340757421"
+    },
+    {
+      "id": "S09",
+      "timeline_in": 8,
+      "timeline_out": 12,
+      "source_in": 0.35,
+      "source_duration": 5.184,
+      "task_id": "454480235667718"
+    }
+  ],
+  "editing": "统一为 720×1280、24fps；每镜选择4秒，以景别变化和视线衔接剪切，保持人物与服装连续。无静态占位镜头。",
+  "source_model": "MiniMax-H3-Max",
+  "additional_successful_generation_tasks": 2
+}

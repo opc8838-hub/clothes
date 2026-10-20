@@ -31,6 +31,15 @@ with ZipFile(update) as z:
         target=(dest/item.filename).resolve();assert target.is_relative_to(dest.resolve())
         target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(z.read(item))
 assert (dest/'assets/fashion/female/video/film-three-shots.mp4').stat().st_size==5395845
+# Versioned text source overrides stay reviewable in Git.
+overrides=root/'pages-overrides'
+if overrides.exists():
+    for source in overrides.rglob('*'):
+        if source.is_file():
+            target=(dest/source.relative_to(overrides)).resolve()
+            assert target.is_relative_to(dest.resolve())
+            target.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copy2(source,target)
 # Build the full downloadable website on GitHub, avoiding a second large local upload.
 full=dest/'deliverables/humen-fashion-talk-site.zip'
 entries=[p for p in dest.rglob('*') if p.is_file() and p!=full]

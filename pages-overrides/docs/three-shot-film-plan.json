@@ -1,0 +1,38 @@
+{
+  "status": "completed",
+  "format": "9:16",
+  "target_seconds": 12,
+  "sequence": [
+    {
+      "id": "S04",
+      "title": "街头行走",
+      "source": "existing_real_video",
+      "edit_seconds": 4
+    },
+    {
+      "id": "S07",
+      "title": "侧身回望",
+      "source": "new_generation",
+      "generation_seconds": 5,
+      "edit_seconds": 4
+    },
+    {
+      "id": "S09",
+      "title": "车旁站定",
+      "source": "new_generation",
+      "generation_seconds": 5,
+      "edit_seconds": 4
+    }
+  ],
+  "additional_generation_estimate_cny": 5,
+  "prompts": {
+    "S07": "以附图为首帧。保持同一原创成年女性的脸、深棕发髻、肤色和银灰挂脖上衣、黑色九分微喇裤、细带凉鞋。固定侧面半身机位，人物身体保持侧向，只有头部自然缓慢转向镜头，最终与镜头对视并停留一秒。手自然垂下，不做其他动作。保持米白石墙街道、白昼柔和自然光、低饱和时装杂志摄影质感。稳定曝光，运动缓慢流畅。领口、胸前几何拼接、服装颜色和人体比例不变。不要新增人物、眼镜、包、首饰、文字、水印；不要变脸、手指变形、突然转场或大幅运镜。",
+    "S09": "以附图为首帧。保持同一原创成年女性的脸、深棕发髻、肤色和银灰挂脖上衣、黑色九分微喇裤、细带凉鞋。人物已经站在停稳的白色复古车旁，双脚保持位置，仅自然呼吸和非常轻微的重心变化，目光平静看向镜头；结尾保持站姿一秒。正面中全景机位固定，仅有极轻微缓慢推近。白车始终静止，不开门、不走动。米白石墙街道、白昼柔和自然光和低饱和杂志摄影质感保持一致，稳定曝光。服装领口、几何拼接、面料和裤脚不变。不要新增人物、眼镜、包、首饰、文字、水印；不要变脸、肢体变形或突然转场。"
+  },
+  "continuity": "同一人物、造型、自然光与街区；行走、回望、停留，依动作匹配剪辑；只在需要时使用短叠化，避免长叠化造成双人重影。",
+  "film_asset": "assets/fashion/female/video/film-three-shots.mp4",
+  "actual_duration_seconds": 12,
+  "additional_successful_tasks": 2,
+  "total_successful_videos": 3,
+  "total_generation_submission_attempts": 5
+}
