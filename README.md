@@ -63,3 +63,14 @@ node tools/preview.mjs
 浏览器打开 http://127.0.0.1:8765 。上传到 GitHub Pages 时仍只需要静态文件，无需构建。
 
 当前仍使用已有二维照片和 AI 转身帧；原始素材的抠图边缘及转身形变不会被 CSS 真正修复。若后续制作 Blender 资产，可用相同画布、挂点和帧数替换 `assets/turn`，并同步导出同视角的正面图。
+
+
+## 服装 AI 演示
+
+完整演示站：[虎门服装 AI 演示](https://opc8838-hub.github.io/clothes/humen-ai-talk/#03)。原服装展厅继续保留。
+
+15 页演示、九镜首帧、S03/S06 尾帧及 S04 实际视频。当前只有 S04 是已生成视频，九镜成片尚未生成。
+
+完整站点包位于 [GitHub Releases](https://github.com/opc8838-hub/clothes/releases/tag/humen-ai-talk-2026-10-20)。
+
+网站由 `.github/workflows/pages.yml` 自动发布。`tools/build-pages.py` 从上述 Release 下载完整演示站并保留原服装展厅；无需通过 Git 重复上传大体积媒体。
