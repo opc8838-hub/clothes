@@ -74,3 +74,10 @@ node tools/preview.mjs
 完整站点包位于 [GitHub Releases](https://github.com/opc8838-hub/clothes/releases/tag/humen-ai-talk-2026-10-20)。
 
 网站由 `.github/workflows/pages.yml` 自动发布。`tools/build-pages.py` 从上述 Release 下载完整演示站并保留原服装展厅；无需通过 Git 重复上传大体积媒体。
+
+
+## 已完成三镜成片
+
+[直接播放12秒短片](https://opc8838-hub.github.io/clothes/humen-ai-talk/film.html)：街头行走 → 侧身回望 → 车旁站定，三个真实生成镜头，每镜4秒。页面提供MP4下载。
+
+本次增量源文件位于 [三镜版本 Release](https://github.com/opc8838-hub/clothes/releases/tag/humen-three-shot-2026-10-21)。构建脚本校验原站点包及增量包的 SHA256，随后生成包含全部新视频的完整站点下载包。
