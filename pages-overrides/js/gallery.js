@@ -133,7 +133,7 @@
       $(selector).replaceChildren(...entries.map(card));
     }
     renderIdentity();
-    const groups=[['garment','01 服装',4],['model','02 人物',6],['life','03 生活摄影',9],['shot','04 镜头',12]];
+    const groups=[['garment','01 服装',4],['model','02 人物',6],['life','03 生活摄影',9],['shot','04 镜头',12]].map(([group,label,to])=>[group,label,window.fashionResolveLegacyIndex?window.fashionResolveLegacyIndex(to):to]);
     const grid=$('#overview-grid');grid.replaceChildren();
     for(const [group,label,to] of groups){
       const entries=state.available.filter(x=>x.group===group&&(group!=='shot'||catalogue.productionSequence.includes(x.shot))),videos=state.available.filter(x=>x.group==='video');

@@ -24,7 +24,7 @@
     $('#stage').focus({preventScroll:true});document.dispatchEvent(new CustomEvent('fashion:page',{detail:{index:n}}));
   }
   matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',e=>setMotion(e.matches,false));
-  const hashPage=()=>{const n=Number(location.hash.slice(1));return Number.isInteger(n)&&n>=1&&n<=slides.length?n-1:0;};
+  const hashPage=()=>{const key=location.hash.slice(1),route=window.FASHION_COURSE_ROUTES?.[key];if(Number.isInteger(route))return route;const n=Number(key);return Number.isInteger(n)&&n>=1&&n<=slides.length?n-1:0;};
   window.addEventListener('hashchange',()=>go(hashPage(),false)); window.addEventListener('popstate',()=>go(hashPage(),false));
   function showDialog(id, opener) { const d=document.getElementById(id); d._opener=opener; d.showModal(); }
   $$('dialog.modal').forEach(d=>{d.addEventListener('close',()=>d._opener?.focus()); d.addEventListener('click',e=>{if(e.target===d)d.close();}); $('.modal-close',d).addEventListener('click',()=>d.close());});
