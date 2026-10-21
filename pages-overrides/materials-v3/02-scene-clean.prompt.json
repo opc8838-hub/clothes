@@ -1,0 +1,7 @@
+{
+  "transparent_background": false,
+  "referenced_image_paths": [
+    "D:/衣服项目/humen-ai-talk/output/materials-v3/03-fusion-full.png"
+  ],
+  "prompt": "Use case: precise-object-edit / photorealistic-natural. Make ONE clean scene plate of the exact same photographed street and same off-white vintage sedan in the reference. REMOVE ONLY THE WOMAN and realistically reconstruct the sidewalk, street and car areas she occluded. Keep the original vertical 2:3 framing, camera location, architectural layout, car direction, wheel design, pavement joints, background parked cars, streetlamp, light and muted colour unchanged. This is a photographic background plate for compositing this same woman later. Preserve natural lens perspective, modest depth of field, stone surface variation, vehicle reflections and grounded tyres. No new people, no architectural redesign, no car redesign, no stylization, no dramatic colour grade, no sharpening, no added text or watermark. Output a single independent seamless photograph."
+}

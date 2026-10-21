@@ -1,0 +1,8 @@
+{
+  "transparent_background": false,
+  "referenced_image_paths": [
+    "D:/衣服项目/humen-ai-talk/assets/fashion/female/model-master.png",
+    "D:/衣服项目/humen-ai-talk/output/materials-v3/03-fusion-full.png"
+  ],
+  "prompt": "Use case: identity-preserve. ONE vertical 2:3 full-length neutral casting photograph of exactly the same adult woman in both references. Reference 1 controls her face, brown eyes and loosely pinned brown hair; reference 2 controls the same silver grey halter fashion top with geometric seam design and wide waist, black ankle-length subtle flare trousers, thin-strap black flat thong sandals and normal body proportions. Place her against a plain neutral grey studio paper backdrop with a visible floor and soft window daylight from camera left. Entire head, both hands and sandals fully visible. Front-facing standing pose, weight comfortably on one leg, arms hanging loosely, both hands clear of the clothing and body. Calm attentive expression, looking a little beside lens. NO sunglasses, jewellery or bag. This is the same person and outfit from reference 2, photographed for a wardrobe fitting, not a new beauty model. Preserve natural skin tone variation, restrained skin texture, fine flyaway hair and believable fabric folds. Real 50mm unretouched casting photo, no beautification, no artificial leg length, no glossy skin, no exaggerated pores or new freckles, no cinematic lighting. Do not change neckline or garment construction. No text, no grid, no montage. Output one independent photograph."
+}

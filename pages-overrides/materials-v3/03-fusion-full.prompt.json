@@ -1,0 +1,9 @@
+{
+  "transparent_background": false,
+  "referenced_image_paths": [
+    "D:/衣服项目/humen-ai-talk/assets/fashion/female/model-master.png",
+    "D:/衣服项目/humen-ai-talk/assets/fashion/female/outfit-v4-natural-light.png",
+    "C:/Users/ADMINI~1/AppData/Local/Temp/codex-clipboard-d968304c-9cca-4ed5-9f76-40cd3db8c87f.jpg"
+  ],
+  "prompt": "Generate ONE independent vertical 2:3 natural fashion photograph. Reference 1 fixes the adult woman's facial identity, brown eyes and tied-up brown hair. Reference 2 fixes her body proportions and exact outfit: silver grey halter fashion top, geometric seam detailing and wide waist, black ankle-length subtly flared trousers, black thin-strap flat sandals. Reference 3 is location inspiration only: quiet cream limestone Parisian street and white vintage four-door sedan. Do not copy its collage or writing. Show the same woman full length standing naturally beside the parked white sedan, shoulders relaxed, both hands visible, looking slightly past camera. No sunglasses in this first frame. Entire head and feet visible, normal human proportions. She is on the sidewalk, car on the road, plausible scale and ground contact. Eye-level 50mm photographic perspective. Soft overcast daylight, understated neutral colour, normal skin texture and slight facial asymmetry, realistic garment folds, real glass reflections, subtle limestone colour variation and patched asphalt. Preserve clothing design and face; integrate light, perspective and contact shadows. The image should look like a candid unretouched location photograph, not a perfectly polished advertisement or architectural rendering. No plastic skin, no excessive freckles or pore sharpening, no HDR, no cinematic glow, no exaggerated bokeh, no artificially elongated legs, no text, no watermark, no collage. Prioritize a convincing coherent photograph."
+}

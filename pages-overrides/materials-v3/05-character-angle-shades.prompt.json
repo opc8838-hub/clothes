@@ -1,0 +1,8 @@
+{
+  "transparent_background": false,
+  "referenced_image_paths": [
+    "D:/衣服项目/humen-ai-talk/output/materials-v3/01-character-full.png",
+    "D:/衣服项目/humen-ai-talk/output/materials-v3/04-eyewear-reference.png"
+  ],
+  "prompt": "Create one independent full-length wardrobe fitting photograph of the same adult woman. Reference 1 controls the entire unchanged outfit, body proportions, full-body framing, neutral grey studio and soft daylight. Reference 2 controls ONLY the identical face and black sunglasses; do not use the grey shirt from reference 2. Show a natural 45-degree three-quarter standing view toward camera-left, head gently facing back toward camera, arms relaxed with both hands visible. Retain exactly the outfit and clothing coverage of reference 1, including silver-grey top, black ankle trousers and black flat sandals. Entire head and feet in frame. No alterations to clothing design or body shape, no added accessories other than the exact glasses, no glamour retouching or stylization. A neutral, fully clothed fashion catalog photo with natural skin and garment texture. No text, no watermark, no grid."
+}

@@ -1,0 +1,101 @@
+{
+  "stage": "first_material_samples",
+  "generated_asset_count": 7,
+  "method": "built-in image_gen",
+  "assets": [
+    {
+      "file": "01-character-full.png",
+      "title": "人物全身 · 无墨镜",
+      "description": "固定人物、银灰挂脖上衣、黑色九分裤和细带凉鞋。"
+    },
+    {
+      "file": "05-character-angle-shades.png",
+      "title": "人物侧角度 · 戴墨镜",
+      "description": "同一人物和穿搭，转向侧前方，供分镜匹配使用。"
+    },
+    {
+      "file": "04-eyewear-reference.png",
+      "title": "墨镜与身份参考",
+      "description": "只参考脸和墨镜；这张灰色圆领上衣不作为最终穿搭。"
+    },
+    {
+      "file": "02-scene-clean.png",
+      "title": "街景底图 · 无人物",
+      "description": "人物移除后的背景，可检查街道、车辆与地面关系。"
+    },
+    {
+      "file": "03-fusion-full.png",
+      "title": "融合备选 · 无墨镜",
+      "description": "人物与穿搭置于石材街区和白色复古车旁，作为无墨镜备选。"
+    },
+    {
+      "file": "06-shot01-wide.png",
+      "title": "分镜1 · 全身建立画面",
+      "description": "戴墨镜、车旁站立。视频建议轻微转头，取用约4秒。"
+    },
+    {
+      "file": "07-shot02-medium.png",
+      "title": "分镜2 · 半身变化",
+      "description": "同一人物、衣服与眼镜。视频建议自然呼吸和轻微视线变化，取用约4秒。"
+    }
+  ],
+  "prompts": {
+    "01-character-full.prompt.json": {
+      "transparent_background": false,
+      "referenced_image_paths": [
+        "D:/衣服项目/humen-ai-talk/assets/fashion/female/model-master.png",
+        "D:/衣服项目/humen-ai-talk/output/materials-v3/03-fusion-full.png"
+      ],
+      "prompt": "Use case: identity-preserve. ONE vertical 2:3 full-length neutral casting photograph of exactly the same adult woman in both references. Reference 1 controls her face, brown eyes and loosely pinned brown hair; reference 2 controls the same silver grey halter fashion top with geometric seam design and wide waist, black ankle-length subtle flare trousers, thin-strap black flat thong sandals and normal body proportions. Place her against a plain neutral grey studio paper backdrop with a visible floor and soft window daylight from camera left. Entire head, both hands and sandals fully visible. Front-facing standing pose, weight comfortably on one leg, arms hanging loosely, both hands clear of the clothing and body. Calm attentive expression, looking a little beside lens. NO sunglasses, jewellery or bag. This is the same person and outfit from reference 2, photographed for a wardrobe fitting, not a new beauty model. Preserve natural skin tone variation, restrained skin texture, fine flyaway hair and believable fabric folds. Real 50mm unretouched casting photo, no beautification, no artificial leg length, no glossy skin, no exaggerated pores or new freckles, no cinematic lighting. Do not change neckline or garment construction. No text, no grid, no montage. Output one independent photograph."
+    },
+    "02-scene-clean.prompt.json": {
+      "transparent_background": false,
+      "referenced_image_paths": [
+        "D:/衣服项目/humen-ai-talk/output/materials-v3/03-fusion-full.png"
+      ],
+      "prompt": "Use case: precise-object-edit / photorealistic-natural. Make ONE clean scene plate of the exact same photographed street and same off-white vintage sedan in the reference. REMOVE ONLY THE WOMAN and realistically reconstruct the sidewalk, street and car areas she occluded. Keep the original vertical 2:3 framing, camera location, architectural layout, car direction, wheel design, pavement joints, background parked cars, streetlamp, light and muted colour unchanged. This is a photographic background plate for compositing this same woman later. Preserve natural lens perspective, modest depth of field, stone surface variation, vehicle reflections and grounded tyres. No new people, no architectural redesign, no car redesign, no stylization, no dramatic colour grade, no sharpening, no added text or watermark. Output a single independent seamless photograph."
+    },
+    "03-fusion-full.prompt.json": {
+      "transparent_background": false,
+      "referenced_image_paths": [
+        "D:/衣服项目/humen-ai-talk/assets/fashion/female/model-master.png",
+        "D:/衣服项目/humen-ai-talk/assets/fashion/female/outfit-v4-natural-light.png",
+        "C:/Users/ADMINI~1/AppData/Local/Temp/codex-clipboard-d968304c-9cca-4ed5-9f76-40cd3db8c87f.jpg"
+      ],
+      "prompt": "Generate ONE independent vertical 2:3 natural fashion photograph. Reference 1 fixes the adult woman's facial identity, brown eyes and tied-up brown hair. Reference 2 fixes her body proportions and exact outfit: silver grey halter fashion top, geometric seam detailing and wide waist, black ankle-length subtly flared trousers, black thin-strap flat sandals. Reference 3 is location inspiration only: quiet cream limestone Parisian street and white vintage four-door sedan. Do not copy its collage or writing. Show the same woman full length standing naturally beside the parked white sedan, shoulders relaxed, both hands visible, looking slightly past camera. No sunglasses in this first frame. Entire head and feet visible, normal human proportions. She is on the sidewalk, car on the road, plausible scale and ground contact. Eye-level 50mm photographic perspective. Soft overcast daylight, understated neutral colour, normal skin texture and slight facial asymmetry, realistic garment folds, real glass reflections, subtle limestone colour variation and patched asphalt. Preserve clothing design and face; integrate light, perspective and contact shadows. The image should look like a candid unretouched location photograph, not a perfectly polished advertisement or architectural rendering. No plastic skin, no excessive freckles or pore sharpening, no HDR, no cinematic glow, no exaggerated bokeh, no artificially elongated legs, no text, no watermark, no collage. Prioritize a convincing coherent photograph."
+    },
+    "04-eyewear-reference.prompt.json": {
+      "transparent_background": false,
+      "referenced_image_paths": [
+        "D:/衣服项目/humen-ai-talk/assets/fashion/female/model-master.png"
+      ],
+      "prompt": "Create one neutral professional casting headshot of the exact same adult woman in the reference, keeping her face, brown hair, hairstyle and grey crew-neck shirt unchanged. Turn her head about 30 degrees toward the left side of the image and add simple black cat-eye acetate sunglasses with dark lenses. Frame only her head and shoulders. Plain grey backdrop, soft natural window light, unretouched photographic skin, realistic sunglasses fit and modest reflections. No extra accessories, no text, no collage. This image is an identity-and-eyewear reference for a fashion project."
+    },
+    "05-character-angle-shades.prompt.json": {
+      "transparent_background": false,
+      "referenced_image_paths": [
+        "D:/衣服项目/humen-ai-talk/output/materials-v3/01-character-full.png",
+        "D:/衣服项目/humen-ai-talk/output/materials-v3/04-eyewear-reference.png"
+      ],
+      "prompt": "Create one independent full-length wardrobe fitting photograph of the same adult woman. Reference 1 controls the entire unchanged outfit, body proportions, full-body framing, neutral grey studio and soft daylight. Reference 2 controls ONLY the identical face and black sunglasses; do not use the grey shirt from reference 2. Show a natural 45-degree three-quarter standing view toward camera-left, head gently facing back toward camera, arms relaxed with both hands visible. Retain exactly the outfit and clothing coverage of reference 1, including silver-grey top, black ankle trousers and black flat sandals. Entire head and feet in frame. No alterations to clothing design or body shape, no added accessories other than the exact glasses, no glamour retouching or stylization. A neutral, fully clothed fashion catalog photo with natural skin and garment texture. No text, no watermark, no grid."
+    },
+    "06-shot01-wide.prompt.json": {
+      "transparent_background": false,
+      "referenced_image_paths": [
+        "D:/衣服项目/humen-ai-talk/output/materials-v3/03-fusion-full.png",
+        "D:/衣服项目/humen-ai-talk/output/materials-v3/05-character-angle-shades.png"
+      ],
+      "prompt": "Create ONE vertical 2:3 natural editorial photograph, shot 1 of a consistent three-shot fashion sequence. Reference 1 fixes the exact street, parked off-white sedan, light, woman and outfit. Reference 2 fixes the same woman's identity and black sunglasses. Photograph her standing relaxed beside the car in a medium-long composition from head to just below knees. She wears the identical silver-grey top and black trousers from the references, and the exact black sunglasses from reference 2. Both arms relaxed, hands outside pockets and away from the car, face looking a little to camera-left as if noticing someone; no interaction with doors. Keep natural human proportions, normal garment coverage, natural skin and fabric folds. Keep the camera at human eye level and the same soft overcast light and muted stone-street colours as reference 1. Car should remain plausibly parked on the road, woman on the pavement, no body-car intersections. 50mm unretouched location photograph. No beautification, no skin gloss, no new accessories, no new architecture, no dramatic lighting, no text, no collage. This is an opening still for a very small head movement, not an action pose."
+    },
+    "07-shot02-medium.prompt.json": {
+      "transparent_background": false,
+      "referenced_image_paths": [
+        "D:/衣服项目/humen-ai-talk/output/materials-v3/06-shot01-wide.png",
+        "D:/衣服项目/humen-ai-talk/output/materials-v3/04-eyewear-reference.png"
+      ],
+      "prompt": "Photograph shot 2 in this same fashion sequence. ONE vertical 2:3 image. Move the camera much closer: MEDIUM SHOT from top of head to upper hips, no knees or feet in the frame. The SAME adult woman with the SAME black sunglasses, pinned brown hair, silver-grey top and black trousers is beside the SAME off-white sedan on the SAME limestone street. Reference 2 reinforces her face and eyewear only, not its grey shirt. Her body is now at a relaxed 45 degree angle toward image-left, face glancing just past the camera, arms naturally down and not touching the glasses. Leave visible air between her and the car. Eye-level 70mm lens impression, original soft overcast daylight and muted colours, natural unretouched skin and cloth folds, realistic background scale and reflections. Keep outfit design and coverage unchanged. This should look like the photographer took several steps closer to capture the next photograph at the same shoot. Neutral fashion editorial, no posing exaggeration, no retouching, no HDR, no extra accessories, no text or collage. CRITICAL: genuinely tighter head-to-hips framing, not another full-body image."
+    }
+  },
+  "video_generated_this_round": false,
+  "review": "已目视查看已返回图片。静态样片仍需检查商品细节和后续镜头连续性；不等于视频已通过检查。"
+}

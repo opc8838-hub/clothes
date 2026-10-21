@@ -1,0 +1,8 @@
+{
+  "transparent_background": false,
+  "referenced_image_paths": [
+    "D:/衣服项目/humen-ai-talk/output/materials-v3/06-shot01-wide.png",
+    "D:/衣服项目/humen-ai-talk/output/materials-v3/04-eyewear-reference.png"
+  ],
+  "prompt": "Photograph shot 2 in this same fashion sequence. ONE vertical 2:3 image. Move the camera much closer: MEDIUM SHOT from top of head to upper hips, no knees or feet in the frame. The SAME adult woman with the SAME black sunglasses, pinned brown hair, silver-grey top and black trousers is beside the SAME off-white sedan on the SAME limestone street. Reference 2 reinforces her face and eyewear only, not its grey shirt. Her body is now at a relaxed 45 degree angle toward image-left, face glancing just past the camera, arms naturally down and not touching the glasses. Leave visible air between her and the car. Eye-level 70mm lens impression, original soft overcast daylight and muted colours, natural unretouched skin and cloth folds, realistic background scale and reflections. Keep outfit design and coverage unchanged. This should look like the photographer took several steps closer to capture the next photograph at the same shoot. Neutral fashion editorial, no posing exaggeration, no retouching, no HDR, no extra accessories, no text or collage. CRITICAL: genuinely tighter head-to-hips framing, not another full-body image."
+}
